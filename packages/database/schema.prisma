@@ -1,0 +1,190 @@
+// schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// --------------------------------------
+// SUPER ADMIN & PLATFORM MANAGEMENT
+// --------------------------------------
+
+model SuperAdmin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hashed (Argon2)
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+model SubscriptionPlan {
+  id             String    @id @default(uuid())
+  code           String    @unique // ex: 'FREE', 'PRO', 'AGENCY'
+  name           String
+  priceMonthly   Decimal
+  maxInvoices    Int       // -1 for unlimited
+  maxUsers       Int       // -1 for unlimited
+  features       Json      // Feature flags like { "api_access": true, "custom_branding": false }
+  companies      Company[]
+}
+
+// --------------------------------------
+// TENANTS (ENTREPRISES CLIENTES)
+// --------------------------------------
+
+model Company {
+  id              String   @id @default(uuid())
+  name            String
+  siren           String   @unique // French Business ID
+  vatNumber       String?  // TVA Intracommunautaire
+  address         Json     // { street, city, zip, country }
+  logoUrl         String?
+  
+  // Subscription related
+  planId          String
+  plan            SubscriptionPlan @relation(fields: [planId], references: [id])
+  subscriptionStatus String // 'ACTIVE', 'PAST_DUE', 'CANCELLED'
+  stripeCustomerId   String?
+
+  // Settings
+  legalMentions   String?  // Mention légale par défaut bas de page
+  facturXProfile  String   @default("BASIC") // BASIC, EN_16931, EXTENDED
+  
+  // Relations
+  users           User[]
+  clients         Client[]
+  invoices        Invoice[]
+  products        Product[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// --------------------------------------
+// USERS (WITHIN COMPANIES)
+// --------------------------------------
+
+enum UserRole {
+  OWNER
+  ADMIN
+  ACCOUNTANT // Read-only + Exports
+  SALES      // Can create drafts only
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  firstName   String
+  lastName    String
+  role        UserRole @default(ADMIN)
+  
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  
+  createdAt   DateTime @default(now())
+}
+
+// --------------------------------------
+// CRM & CATALOG
+// --------------------------------------
+
+model Client {
+  id          String   @id @default(uuid())
+  name        String   
+  isBusiness  Boolean  @default(true)
+  siren       String?
+  vatNumber   String?
+  email       String
+  address     Json     // { billing: {...}, delivery: {...} }
+  
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  invoices    Invoice[]
+  
+  createdAt   DateTime @default(now())
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal
+  vatRate     Decimal  // 20.0, 10.0, 5.5, etc.
+  unit        String   @default("piece") // jour, heure, forfait, etc.
+  
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+}
+
+// --------------------------------------
+// INVOICING CORE (COMPLIANCE CRITICAL)
+// --------------------------------------
+
+enum InvoiceStatus {
+  DRAFT       // Modifiable
+  VALIDATED   // Scellé, envoyé au client (Immutable)
+  PARTIALLY_PAID
+  PAID
+  OVERDUE     // En retard
+  CANCELLED   // Annulé (Nécessite Avoir)
+}
+
+enum InvoiceType {
+  INVOICE
+  CREDIT_NOTE // Avoir
+  QUOTE       // Devis
+}
+
+model Invoice {
+  id              String        @id @default(uuid())
+  
+  // Chrono Sequence (Must be unique per Company + Year)
+  seqNumber       Int           // 1, 2, 3...
+  invoiceNumber   String        // "2026-F001" (Generated at validation)
+  
+  type            InvoiceType   @default(INVOICE)
+  status          InvoiceStatus @default(DRAFT)
+  
+  issueDate       DateTime      @default(now()) // Date d'émission
+  dueDate         DateTime?     // Date d'échéance
+  validationDate  DateTime?     // TIMESTAMP CRITIQUE LOI ANTI-FRAUDE
+  
+  // Amounts
+  subTotal        Decimal       // HT
+  taxAmount       Decimal       // TVA
+  total           Decimal       // TTC
+  
+  // Compliance / Security
+  pdfUrl          String?       // Lien S3 vers le PDF/A-3 (Factur-X)
+  securityHash    String?       // SHA-256 Chain of previous invoice hash
+  previousHash    String?       // Hash of the invoice N-1
+  
+  // Relations
+  clientId        String
+  client          Client        @relation(fields: [clientId], references: [id])
+  companyId       String
+  company         Company       @relation(fields: [companyId], references: [id])
+  items           InvoiceItem[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([companyId, invoiceNumber]) // Unicité du numéro de facture par entreprise
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  description String
+  quantity    Decimal
+  unitPrice   Decimal
+  vatRate     Decimal
+  total       Decimal
+  
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+}

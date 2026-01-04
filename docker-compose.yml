@@ -1,0 +1,59 @@
+version: '3.8'
+
+networks:
+  saas-network:
+    driver: bridge
+
+volumes:
+  db-data:
+  redis-data:
+  letsencrypt:
+
+services:
+  # ----------------------------------------------------------------
+  # REVERSE PROXY (TRAEFIK)
+  # ----------------------------------------------------------------
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true" # Dev mode dashboard on 8080
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      # No HTTPS for local dev to keep it simple, or use self-signed
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - saas-network
+
+  # ----------------------------------------------------------------
+  # INFRASTRUCTURE (DB & REDIS)
+  # ----------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: saas_admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: saas_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Exposed for local tool access (Prisma Studio)
+    networks:
+      - saas-network
+
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - saas-network
