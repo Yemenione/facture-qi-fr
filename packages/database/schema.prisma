@@ -1,7 +1,7 @@
 // schema.prisma
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -14,7 +14,7 @@ generator client {
 // --------------------------------------
 
 model SuperAdmin {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String   // Hashed (Argon2)
   name      String?
@@ -22,10 +22,10 @@ model SuperAdmin {
 }
 
 model SubscriptionPlan {
-  id             String    @id @default(uuid())
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
   code           String    @unique // ex: 'FREE', 'PRO', 'AGENCY'
   name           String
-  priceMonthly   Decimal
+  priceMonthly   Int       // Using Int for cents or simple handling, or Float. Decimal is supported but requires care.
   maxInvoices    Int       // -1 for unlimited
   maxUsers       Int       // -1 for unlimited
   features       Json      // Feature flags like { "api_access": true, "custom_branding": false }
@@ -37,7 +37,7 @@ model SubscriptionPlan {
 // --------------------------------------
 
 model Company {
-  id              String   @id @default(uuid())
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   siren           String   @unique // French Business ID
   vatNumber       String?  // TVA Intracommunautaire
@@ -45,7 +45,7 @@ model Company {
   logoUrl         String?
   
   // Subscription related
-  planId          String
+  planId          String   @db.ObjectId
   plan            SubscriptionPlan @relation(fields: [planId], references: [id])
   subscriptionStatus String // 'ACTIVE', 'PAST_DUE', 'CANCELLED'
   stripeCustomerId   String?
@@ -76,14 +76,14 @@ enum UserRole {
 }
 
 model User {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   email       String   @unique
   password    String
   firstName   String
   lastName    String
   role        UserRole @default(ADMIN)
   
-  companyId   String
+  companyId   String   @db.ObjectId
   company     Company  @relation(fields: [companyId], references: [id])
   
   createdAt   DateTime @default(now())
@@ -94,7 +94,7 @@ model User {
 // --------------------------------------
 
 model Client {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String   
   isBusiness  Boolean  @default(true)
   siren       String?
@@ -102,7 +102,7 @@ model Client {
   email       String
   address     Json     // { billing: {...}, delivery: {...} }
   
-  companyId   String
+  companyId   String   @db.ObjectId
   company     Company  @relation(fields: [companyId], references: [id])
   invoices    Invoice[]
   
@@ -110,14 +110,14 @@ model Client {
 }
 
 model Product {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  price       Decimal
-  vatRate     Decimal  // 20.0, 10.0, 5.5, etc.
+  price       Float    // Decimal is tricky in Mongo, using Float for simplicity or Int (cents) is often easier. Let's stick to Float/Int or keep Decimal if mapped correctly.
+  vatRate     Float
   unit        String   @default("piece") // jour, heure, forfait, etc.
   
-  companyId   String
+  companyId   String   @db.ObjectId
   company     Company  @relation(fields: [companyId], references: [id])
 }
 
@@ -141,7 +141,7 @@ enum InvoiceType {
 }
 
 model Invoice {
-  id              String        @id @default(uuid())
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
   
   // Chrono Sequence (Must be unique per Company + Year)
   seqNumber       Int           // 1, 2, 3...
@@ -155,9 +155,9 @@ model Invoice {
   validationDate  DateTime?     // TIMESTAMP CRITIQUE LOI ANTI-FRAUDE
   
   // Amounts
-  subTotal        Decimal       // HT
-  taxAmount       Decimal       // TVA
-  total           Decimal       // TTC
+  subTotal        Float
+  taxAmount       Float
+  total           Float
   
   // Compliance / Security
   pdfUrl          String?       // Lien S3 vers le PDF/A-3 (Factur-X)
@@ -165,10 +165,10 @@ model Invoice {
   previousHash    String?       // Hash of the invoice N-1
   
   // Relations
-  clientId        String
-  client          Client        @relation(fields: [clientId], references: [id])
-  companyId       String
-  company         Company       @relation(fields: [companyId], references: [id])
+  clientId        String   @db.ObjectId
+  client          Client   @relation(fields: [clientId], references: [id])
+  companyId       String   @db.ObjectId
+  company         Company  @relation(fields: [companyId], references: [id])
   items           InvoiceItem[]
   
   createdAt       DateTime @default(now())
@@ -178,13 +178,13 @@ model Invoice {
 }
 
 model InvoiceItem {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   description String
-  quantity    Decimal
-  unitPrice   Decimal
-  vatRate     Decimal
-  total       Decimal
+  quantity    Float
+  unitPrice   Float
+  vatRate     Float
+  total       Float
   
-  invoiceId   String
+  invoiceId   String   @db.ObjectId
   invoice     Invoice  @relation(fields: [invoiceId], references: [id])
 }

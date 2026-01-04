@@ -9,6 +9,7 @@ volumes:
   redis-data:
   letsencrypt:
 
+
 services:
   # ----------------------------------------------------------------
   # REVERSE PROXY (TRAEFIK)
@@ -22,7 +23,6 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
-      # No HTTPS for local dev to keep it simple, or use self-signed
     ports:
       - "80:80"
       - "8080:8080"
@@ -35,16 +35,15 @@ services:
   # INFRASTRUCTURE (DB & REDIS)
   # ----------------------------------------------------------------
   db:
-    image: postgres:16-alpine
+    image: mongo:6.0
     restart: always
     environment:
-      POSTGRES_USER: saas_admin
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: saas_db
+      MONGO_INITDB_ROOT_USERNAME: saas_admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/data/db
     ports:
-      - "5432:5432" # Exposed for local tool access (Prisma Studio)
+      - "27017:27017" # Exposed for local tools (Compass etc)
     networks:
       - saas-network
 
@@ -57,3 +56,50 @@ services:
       - "6379:6379"
     networks:
       - saas-network
+
+  # ----------------------------------------------------------------
+  # APPLICATIONS
+  # ----------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "mongodb://saas_admin:password123@db:27017/saas-db?authSource=admin"
+      REDIS_URL: "redis://redis:6379"
+      JWT_SECRET: "dev_secret_key"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - saas-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`api.localhost`)"
+
+  client-app:
+    build:
+      context: .
+      dockerfile: apps/client-app/Dockerfile
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: "http://api.localhost"
+    networks:
+      - saas-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client.rule=Host(`localhost`)"
+
+  admin-panel:
+    build:
+      context: .
+      dockerfile: apps/admin-panel/Dockerfile
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: "http://api.localhost"
+    networks:
+      - saas-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.admin.rule=Host(`admin.localhost`)"
