@@ -3,6 +3,18 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { authService } from '../../services/auth.service';
+import { useAuthStore } from '../../store/auth-store';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -18,88 +30,104 @@ export default function RegisterPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const { login } = useAuthStore();
+    const [error, setError] = useState('');
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Register:', formData);
-        router.push('/dashboard');
+        setError('');
+        try {
+            const data = await authService.register(formData);
+            login(data.user);
+            router.push('/dashboard');
+        } catch (err: any) {
+            console.error(err);
+            setError(err.response?.data?.message || 'Une erreur est survenue lors de l\'inscription.');
+        }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Créer un compte</h2>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="rounded-md shadow-sm -space-y-px">
-                        <div>
-                            <input
-                                name="companyName"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Nom de l'entreprise"
-                                onChange={handleChange}
-                            />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+            <Card className="w-[450px] shadow-lg">
+                <CardHeader>
+                    <CardTitle className="text-2xl text-center">Créer un compte</CardTitle>
+                    <CardDescription className="text-center">
+                        Commencez gratuitement avec votre entreprise
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit}>
+                        <div className="grid gap-4">
+                            {error && (
+                                <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                                    {error}
+                                </div>
+                            )}
+                            <div className="grid gap-2">
+                                <Label htmlFor="companyName">Nom de l'entreprise</Label>
+                                <Input
+                                    id="companyName"
+                                    name="companyName"
+                                    placeholder="Ma Super Entreprise"
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="firstName">Prénom</Label>
+                                    <Input
+                                        id="firstName"
+                                        name="firstName"
+                                        placeholder="Jean"
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="lastName">Nom</Label>
+                                    <Input
+                                        id="lastName"
+                                        name="lastName"
+                                        placeholder="Dupont"
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="jean@exemple.com"
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="password">Mot de passe</Label>
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <Button className="w-full" type="submit">
+                                S'inscrire
+                            </Button>
                         </div>
-                        <div>
-                            <input
-                                name="firstName"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Prénom"
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <input
-                                name="lastName"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Nom"
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <input
-                                name="email"
-                                type="email"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Email"
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <input
-                                name="password"
-                                type="password"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Mot de passe"
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <button
-                            type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            S'inscrire
-                        </button>
-                    </div>
-
-                    <div className="text-sm text-center">
-                        <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    </form>
+                    <div className="mt-4 text-center text-sm">
+                        <Link href="/login" className="underline hover:text-primary">
                             Déjà un compte ? Se connecter
                         </Link>
                     </div>
-                </form>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }

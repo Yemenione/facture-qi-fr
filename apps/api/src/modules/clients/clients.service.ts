@@ -9,7 +9,13 @@ export class ClientsService {
     create(companyId: string, data: CreateClientDto) {
         return this.prisma.client.create({
             data: {
-                ...data,
+                name: data.name,
+                email: data.email,
+                phone: data.phone,
+                isBusiness: data.isBusiness ?? true,
+                siren: data.siren,
+                vatNumber: data.vatNumber,
+                address: data.address || {},
                 companyId,
             }
         });

@@ -1,40 +1,53 @@
-import axios from 'axios'
+import axios from 'axios';
 
-// In a real app, use env var
-const API_URL = 'http://localhost:3001'
+const API_URL = process.env.NEXT_PUBLIC_API_URL + '/invoices';
 
-export const api = axios.create({
-    baseURL: API_URL,
-    withCredentials: true,
-})
-
-export interface InvoiceDTO {
-    id: string
-    invoiceNumber: string
-    client: string
-    total: number
-    status: string
-    issueDate: string
+export interface InvoiceItem {
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    vatRate: number;
 }
 
-export const InvoiceService = {
-    getAll: async () => {
-        const { data } = await api.get<InvoiceDTO[]>('/invoices')
-        return data
+export interface CreateInvoiceDto {
+    clientId: string;
+    items: InvoiceItem[];
+    dueDate?: string;
+}
+
+const invoiceService = {
+    create: async (data: CreateInvoiceDto) => {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.post(API_URL, data, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
     },
 
-    create: async (payload: any) => {
-        const { data } = await api.post('/invoices', payload)
-        return data
+    findAll: async () => {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(API_URL, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
     },
 
-    validate: async (id: string) => {
-        const { data } = await api.post(`/invoices/${id}/validate`)
-        return data
+    findOne: async (id: string) => {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(`${API_URL}/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
     },
 
     downloadPdf: async (id: string) => {
-        const { data } = await api.get(`/invoices/${id}/pdf`, { responseType: 'blob' })
-        return data
+        const token = localStorage.getItem('access_token');
+        const response = await axios.get(`${API_URL}/${id}/pdf`, {
+            headers: { Authorization: `Bearer ${token}` },
+            responseType: 'blob',
+        });
+        return response.data;
     }
-}
+};
+
+export default invoiceService;

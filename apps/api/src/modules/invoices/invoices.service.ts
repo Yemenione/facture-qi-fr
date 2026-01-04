@@ -93,4 +93,18 @@ export class InvoicesService {
             });
         });
     }
+    async findAll(companyId: string) {
+        return this.prisma.invoice.findMany({
+            where: { companyId },
+            include: { client: true },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
+
+    async findOne(companyId: string, id: string) {
+        return this.prisma.invoice.findFirst({
+            where: { id, companyId },
+            include: { client: true, items: true }
+        });
+    }
 }

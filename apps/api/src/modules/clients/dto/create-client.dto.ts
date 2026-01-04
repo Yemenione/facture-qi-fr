@@ -1,8 +1,28 @@
+import { IsString, IsEmail, IsOptional, IsBoolean } from 'class-validator';
+
 export class CreateClientDto {
+    @IsString()
     name: string;
+
+    @IsEmail()
     email: string;
-    isBusiness: boolean;
+
+    @IsOptional()
+    @IsBoolean()
+    isBusiness?: boolean;
+
+    @IsOptional()
+    @IsString()
     siren?: string;
+
+    @IsOptional()
+    @IsString()
     vatNumber?: string;
-    address: any;
+
+    @IsOptional()
+    @IsString()
+    phone?: string;
+
+    @IsOptional()
+    address?: any;
 }

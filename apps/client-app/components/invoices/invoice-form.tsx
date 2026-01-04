@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
 import { useInvoiceStore } from '@/store/invoice-store'
-import { InvoiceService } from '@/services/invoice.service'
+import invoiceService from '@/services/invoice.service'
 
 const invoiceSchema = z.object({
     clientId: z.string().min(1, "Veuillez sélectionner un client"),
@@ -66,7 +66,7 @@ export function InvoiceForm() {
     const onSubmit = async (data: InvoiceFormValues) => {
         try {
             console.log("Saving...", data)
-            await InvoiceService.create(data)
+            await invoiceService.create(data)
             alert('Facture brouillon créée !')
         } catch (e) {
             alert('Erreur sauvegarde')

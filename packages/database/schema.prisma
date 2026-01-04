@@ -41,6 +41,8 @@ model Company {
   name            String
   siren           String   @unique // French Business ID
   vatNumber       String?  // TVA Intracommunautaire
+  email           String?
+  phone           String?
   address         Json     // { street, city, zip, country }
   logoUrl         String?
   
@@ -100,6 +102,7 @@ model Client {
   siren       String?
   vatNumber   String?
   email       String
+  phone       String?
   address     Json     // { billing: {...}, delivery: {...} }
   
   companyId   String   @db.ObjectId
