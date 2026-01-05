@@ -1,9 +1,8 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useEffect, useState } from "react"
-import { Plus, Search, MoreHorizontal, Package } from "lucide-react"
-
+import { Plus, Search, Tag, Package, MoreHorizontal, Pencil, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -13,12 +12,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import productService, { Product } from "@/services/product.service"
 import { formatCurrency } from "@/lib/utils"
-import productService from "@/services/product.service"
 
 export default function ProductsPage() {
-    const [products, setProducts] = useState<any[]>([])
+    const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
+    const [searchTerm, setSearchTerm] = useState("")
 
     useEffect(() => {
         loadProducts()
@@ -26,7 +26,7 @@ export default function ProductsPage() {
 
     const loadProducts = async () => {
         try {
-            const data = await productService.findAll()
+            const data = await productService.getAll()
             setProducts(data)
         } catch (error) {
             console.error("Failed to load products", error)
@@ -35,82 +35,128 @@ export default function ProductsPage() {
         }
     }
 
+    const handleDelete = async (id: string) => {
+        if (!confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) return;
+        try {
+            await productService.delete(id);
+            setProducts(products.filter(p => p.id !== id));
+        } catch (error) {
+            alert("Erreur lors de la suppression");
+        }
+    }
+
+    const filteredProducts = products.filter(p =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
+    if (loading) return <div className="p-8">Chargement...</div>
+
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 max-w-7xl mx-auto p-4 pb-20">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Produits & Services</h1>
-                    <p className="text-muted-foreground">Gérez votre catalogue.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Catalogue Produits</h1>
+                    <p className="text-muted-foreground">Gérez vos articles et services récurrents.</p>
                 </div>
-                <Button asChild>
+                <Button asChild className="bg-slate-900 rounded-full">
                     <Link href="/dashboard/products/new">
-                        <Plus className="mr-2 h-4 w-4" /> Ajouter un produit
+                        <Plus className="mr-2 h-4 w-4" /> Nouveau Produit
                     </Link>
                 </Button>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Catalogue</CardTitle>
-                    <CardDescription>
-                        Liste de vos produits et services disponibles.
-                    </CardDescription>
-                    <div className="pt-4">
-                        <div className="relative">
-                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="Rechercher un produit..." className="pl-8 max-w-sm" />
+            {/* Stats Cards (Mini Bento) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="bg-gradient-to-br from-blue-50 to-white border-blue-100 shadow-sm">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-blue-600">Total Articles</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{products.length}</div>
+                    </CardContent>
+                </Card>
+                {/* Placeholders for future stats */}
+                <Card className="bg-white border-slate-100 shadow-sm">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">Prix Moyen</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {products.length > 0 ? formatCurrency(products.reduce((acc, p) => acc + p.price, 0) / products.length) : '0 €'}
                         </div>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="rounded-md border">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-muted/50 text-muted-foreground">
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* List with Search */}
+            <div className="space-y-4">
+                <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Rechercher un produit..."
+                        className="pl-10 max-w-sm rounded-full bg-white"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                            <tr>
+                                <th className="px-6 py-4">Nom</th>
+                                <th className="px-6 py-4">Prix Unitaire</th>
+                                <th className="px-6 py-4">TVA</th>
+                                <th className="px-6 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {filteredProducts.length === 0 ? (
                                 <tr>
-                                    <th className="h-12 px-4 align-middle font-medium">Nom</th>
-                                    <th className="h-12 px-4 align-middle font-medium">Prix Unitaire (HT)</th>
-                                    <th className="h-12 px-4 align-middle font-medium">Type</th>
-                                    <th className="h-12 px-4 align-middle font-medium text-right">Actions</th>
+                                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
+                                        Aucun produit trouvé. Créez-en un nouveau !
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={4} className="p-4 text-center">Chargement...</td>
-                                    </tr>
-                                ) : products.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={4} className="p-4 text-center">Aucun produit trouvé.</td>
-                                    </tr>
-                                ) : (
-                                    products.map((product) => (
-                                        <tr key={product.id} className="border-b transition-colors hover:bg-muted/50">
-                                            <td className="p-4 align-middle font-medium flex items-center gap-2">
-                                                <div className="h-8 w-8 rounded-md bg-secondary/20 flex items-center justify-center text-secondary-foreground">
-                                                    <Package className="h-4 w-4" />
+                            ) : (
+                                filteredProducts.map((product) => (
+                                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                                        <td className="px-6 py-4 font-medium text-slate-900">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded bg-slate-100 flex items-center justify-center text-slate-500">
+                                                    <Tag className="h-4 w-4" />
                                                 </div>
-                                                {product.name}
-                                            </td>
-                                            <td className="p-4 align-middle">{formatCurrency(product.price)}</td>
-                                            <td className="p-4 align-middle">
-                                                <span className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-foreground">
-                                                    {product.unit || 'Service'}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 align-middle text-right">
-                                                <Button variant="ghost" size="icon">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                    <span className="sr-only">Menu</span>
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </CardContent>
-            </Card>
+                                                <div>
+                                                    <div>{product.name}</div>
+                                                    <div className="text-xs text-slate-400 font-normal truncate max-w-[200px]">{product.description}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 font-medium text-slate-700">
+                                            {formatCurrency(product.price)}
+                                            <span className="text-xs text-muted-foreground font-normal ml-1">/ {product.unit}</span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                                                {product.vatRate}%
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <Button variant="ghost" size="icon" asChild>
+                                                <Link href={`/dashboard/products/${product.id}`}>
+                                                    <Pencil className="h-4 w-4 text-slate-500" />
+                                                </Link>
+                                            </Button>
+                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)} className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                                <Trash className="h-4 w-4" />
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     )
 }

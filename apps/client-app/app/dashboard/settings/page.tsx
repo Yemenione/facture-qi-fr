@@ -7,15 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loader2 } from "lucide-react"
+import { Loader2, Building2, Scale, CreditCard, Palette, Save, Search } from "lucide-react"
 
 export default function SettingsPage() {
     const { user } = useAuthStore()
@@ -30,7 +24,6 @@ export default function SettingsPage() {
     const loadData = async () => {
         try {
             const data = await companyService.get()
-            // Flat address mapping
             const address = typeof data.address === 'string' ? { street: data.address } : data.address || {}
             setCompany({ ...data, address })
         } catch (error) {
@@ -44,7 +37,6 @@ export default function SettingsPage() {
         e.preventDefault()
         setSaving(true)
         try {
-            // Flatten address for API
             const payload = {
                 ...company,
                 address: company.address
@@ -70,52 +62,99 @@ export default function SettingsPage() {
         }))
     }
 
-    if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>
+    const handleSiretSearch = async () => {
+        if (!company.siret || company.siret.length < 9) {
+            alert("Numéro SIREN/SIRET invalide")
+            return
+        }
+        try {
+            const data = await companyService.searchSiret(company.siret)
+            if (data) {
+                setCompany((prev: any) => ({
+                    ...prev,
+                    name: data.name || prev.name,
+                    rcs: data.rcs || prev.rcs,
+                    vatNumber: data.vatNumber || prev.vatNumber,
+                    capital: prev.capital, // API might not return this, keep existing
+                    legalMentions: prev.legalMentions,
+                    address: {
+                        street: (data as any).street || prev.address?.street,
+                        zip: (data as any).zipCode || prev.address?.zip,
+                        city: (data as any).city || prev.address?.city,
+                        country: "France"
+                    }
+                }))
+                alert("Informations trouvées et remplies ! ✅")
+            }
+        } catch (error) {
+            console.error(error)
+            alert("Entreprise non trouvée")
+        }
+    }
+
+    if (loading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin text-slate-400" /></div>
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto pb-20">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Paramètres de l'Entreprise</h1>
-                <p className="text-muted-foreground">Gérez vos informations légales, coordonnées bancaires et préférences de facturation.</p>
+        <div className="space-y-6 max-w-5xl mx-auto p-4 pb-20">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Paramètres de l'entreprise</h1>
+                    <p className="text-slate-500 mt-1">Configurez vos informations légales et vos préférences.</p>
+                </div>
+                <Button onClick={onSubmit} disabled={saving} className="bg-slate-900 hover:bg-slate-800 shadow-lg">
+                    {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Save className="mr-2 h-4 w-4" /> Enregistrer les modifications
+                </Button>
             </div>
 
             <form onSubmit={onSubmit}>
                 <Tabs defaultValue="general" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4">
-                        <TabsTrigger value="general">Général</TabsTrigger>
-                        <TabsTrigger value="legal">Mentions Légales</TabsTrigger>
-                        <TabsTrigger value="banking">Banque</TabsTrigger>
-                        <TabsTrigger value="branding">Apparence</TabsTrigger>
+                    <TabsList className="grid w-full grid-cols-4 bg-slate-100 p-1 rounded-xl">
+                        <TabsTrigger value="general" className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all"><Building2 className="w-4 h-4 mr-2" /> Général</TabsTrigger>
+                        <TabsTrigger value="legal" className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all"><Scale className="w-4 h-4 mr-2" /> Juridique</TabsTrigger>
+                        <TabsTrigger value="banking" className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all"><CreditCard className="w-4 h-4 mr-2" /> Banque</TabsTrigger>
+                        <TabsTrigger value="branding" className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all"><Palette className="w-4 h-4 mr-2" /> Apparence</TabsTrigger>
                     </TabsList>
 
                     {/* GENERAL TAB */}
                     <TabsContent value="general" className="space-y-4 mt-6">
-                        <Card>
+                        <Card className="border-slate-200 shadow-sm">
                             <CardHeader>
                                 <CardTitle>Informations Générales</CardTitle>
-                                <CardDescription>Identité de base de votre entreprise.</CardDescription>
+                                <CardDescription>Identité publique de votre entreprise.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Nom de l'entreprise</Label>
-                                        <Input value={company.name || ''} onChange={e => handleChange('name', e.target.value)} />
+                                        <Input value={company.name || ''} onChange={(e) => handleChange('name', e.target.value)} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Email de contact</Label>
-                                        <Input value={company.email || ''} onChange={e => handleChange('email', e.target.value)} />
+                                        <Input value={company.email || ''} onChange={(e) => handleChange('email', e.target.value)} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Téléphone</Label>
-                                        <Input value={company.phone || ''} onChange={e => handleChange('phone', e.target.value)} />
+                                        <Input value={company.phone || ''} onChange={(e) => handleChange('phone', e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Site Web</Label>
+                                        <Input value={company.website || ''} onChange={(e) => handleChange('website', e.target.value)} />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Adresse</Label>
-                                    <Input placeholder="Numéro et rue" value={company.address?.street || ''} onChange={e => handleAddressChange('street', e.target.value)} />
-                                    <div className="grid grid-cols-3 gap-4 mt-2">
-                                        <Input placeholder="Code Postal" value={company.address?.zip || ''} onChange={e => handleAddressChange('zip', e.target.value)} />
-                                        <Input placeholder="Ville" className="col-span-2" value={company.address?.city || ''} onChange={e => handleAddressChange('city', e.target.value)} />
+                                    <Label>Rue</Label>
+                                    <Input value={company.address?.street || ''} onChange={(e) => handleAddressChange('street', e.target.value)} />
+                                </div>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>Code Postal</Label>
+                                        <Input value={company.address?.zip || ''} onChange={(e) => handleAddressChange('zip', e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2 col-span-2">
+                                        <Label>Ville</Label>
+                                        <Input value={company.address?.city || ''} onChange={(e) => handleAddressChange('city', e.target.value)} />
                                     </div>
                                 </div>
                             </CardContent>
@@ -124,53 +163,43 @@ export default function SettingsPage() {
 
                     {/* LEGAL TAB */}
                     <TabsContent value="legal" className="space-y-4 mt-6">
-                        <Card>
+                        <Card className="border-slate-200 shadow-sm">
                             <CardHeader>
-                                <CardTitle>Mentions Légales Obligatoires (2026)</CardTitle>
-                                <CardDescription>Ces informations doivent apparaître sur vos factures pour être conformes.</CardDescription>
+                                <CardTitle>Mentions Légales & Fiscales</CardTitle>
+                                <CardDescription>Ces informations apparaîtront sur vos factures.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label>SIREN</Label>
-                                        <Input value={company.siren || ''} disabled />
+                                        <Label>SIREN / SIRET</Label>
+                                        <div className="flex gap-2">
+                                            <Input value={company.siret || ''} onChange={(e) => handleChange('siret', e.target.value)} placeholder="123 456 789 00012" />
+                                            <Button type="button" variant="secondary" onClick={handleSiretSearch} title="Remplir automatiquement">
+                                                <Search className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        <p className="text-[10px] text-muted-foreground">Cliquez sur la loupe pour auto-remplir.</p>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>SIRET</Label>
-                                        <Input value={company.siret || ''} onChange={e => handleChange('siret', e.target.value)} />
+                                        <Label>Numéro TVA Intracommunautaire</Label>
+                                        <Input value={company.vatNumber || ''} onChange={(e) => handleChange('vatNumber', e.target.value)} />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Numéro de TVA Intracommunautaire</Label>
-                                        <Input value={company.vatNumber || ''} onChange={e => handleChange('vatNumber', e.target.value)} />
+                                        <Label>RCS / RM</Label>
+                                        <Input value={company.rcs || ''} onChange={(e) => handleChange('rcs', e.target.value)} placeholder="ex: RCS Paris B 123 456 789" />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Forme Juridique (ex: SAS, EURL)</Label>
-                                        <Input value={company.legalForm || ''} onChange={e => handleChange('legalForm', e.target.value)} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Capital Social (ex: 1000)</Label>
-                                        <Input value={company.capital || ''} onChange={e => handleChange('capital', e.target.value)} placeholder="Montant en €" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Ville d'immatriculation (RCS)</Label>
-                                        <Input value={company.rcs || ''} onChange={e => handleChange('rcs', e.target.value)} placeholder="ex: Paris" />
+                                        <Label>Capital Social</Label>
+                                        <Input value={company.capital || ''} onChange={(e) => handleChange('capital', e.target.value)} placeholder="ex: 1000 €" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Mentions Légales (Pied de page)</Label>
+                                    <Label>Mentions légales spécifiques (Pied de page)</Label>
                                     <Textarea
-                                        placeholder="Ex: SAS au capital de 1000€ - RCS Paris B 123 456 789 - TVA FR 12 123456789"
                                         value={company.legalMentions || ''}
-                                        onChange={e => handleChange('legalMentions', e.target.value)}
-                                    />
-                                    <p className="text-xs text-muted-foreground">Texte qui apparaîtra en bas de chaque page de la facture.</p>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Conditions Pénalités de Retard</Label>
-                                    <Input
-                                        placeholder="Ex: 3 fois le taux d'intérêt légal. Indemnité forfaitaire de 40€."
-                                        value={company.penalties || ''}
-                                        onChange={e => handleChange('penalties', e.target.value)}
+                                        onChange={(e) => handleChange('legalMentions', e.target.value)}
+                                        placeholder="Mentions obligatoires spécifiques à votre activité..."
+                                        className="h-24"
                                     />
                                 </div>
                             </CardContent>
@@ -179,19 +208,23 @@ export default function SettingsPage() {
 
                     {/* BANKING TAB */}
                     <TabsContent value="banking" className="space-y-4 mt-6">
-                        <Card>
+                        <Card className="border-slate-200 shadow-sm">
                             <CardHeader>
-                                <CardTitle>Coordonnées Bancaires</CardTitle>
+                                <CardTitle>Coordonnées Bancaires (RIB)</CardTitle>
                                 <CardDescription>Pour permettre à vos clients de vous payer par virement.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
                                     <Label>IBAN</Label>
-                                    <Input value={company.iban || ''} onChange={e => handleChange('iban', e.target.value)} placeholder="FR76 ...." />
+                                    <Input value={company.iban || ''} onChange={(e) => handleChange('iban', e.target.value)} placeholder="FR76 ..." />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>BIC / SWIFT</Label>
-                                    <Input value={company.bic || ''} onChange={e => handleChange('bic', e.target.value)} />
+                                    <Input value={company.bic || ''} onChange={(e) => handleChange('bic', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Nom de la banque</Label>
+                                    <Input placeholder="ex: BNP Paribas" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -199,32 +232,24 @@ export default function SettingsPage() {
 
                     {/* BRANDING TAB */}
                     <TabsContent value="branding" className="space-y-4 mt-6">
-                        <Card>
+                        <Card className="border-slate-200 shadow-sm">
                             <CardHeader>
-                                <CardTitle>Apparence</CardTitle>
-                                <CardDescription>Personnalisez vos documents.</CardDescription>
+                                <CardTitle>Personnalisation</CardTitle>
+                                <CardDescription>Ajoutez votre logo et définissez vos couleurs.</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label>Logo (URL)</Label>
-                                    <Input value={company.logoUrl || ''} onChange={e => handleChange('logoUrl', e.target.value)} placeholder="https://..." />
-                                    {company.logoUrl && (
-                                        <div className="mt-4 p-4 border rounded bg-gray-50 flex justify-center">
-                                            <img src={company.logoUrl} alt="Preview" className="h-20 object-contain" />
+                            <CardContent>
+                                <div className="flex items-center justify-center p-8 border-2 border-dashed border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                                    <div className="text-center">
+                                        <div className="mt-2 text-sm text-slate-600">
+                                            <span className="font-semibold text-blue-600">Cliquez pour uploader</span> ou glissez-déposez
                                         </div>
-                                    )}
+                                        <p className="text-xs text-slate-500">Mettez votre logo ici (PNG, JPG)</p>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
                     </TabsContent>
                 </Tabs>
-
-                <div className="mt-6 flex justify-end">
-                    <Button type="submit" size="lg" disabled={saving}>
-                        {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Enregistrer les modifications
-                    </Button>
-                </div>
             </form>
         </div>
     )

@@ -21,6 +21,10 @@ export interface CreateClientDto {
     name: string;
     isBusiness: boolean;
     siren?: string;
+    siret?: string;
+    legalForm?: string;
+    nafCode?: string;
+    vatSystem?: string;
     vatNumber?: string;
     email: string;
     phone?: string;

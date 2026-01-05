@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Download, Mail, Printer } from "lucide-react"
+import { ArrowLeft, Download, Mail, Printer, CheckCircle, XCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -62,6 +62,17 @@ export default function InvoiceDetailsPage() {
         }
     }
 
+    const updateStatus = async (status: string) => {
+        if (!confirm(`Changer le statut en ${status} ?`)) return;
+        try {
+            await invoiceService.updateStatus(id, status);
+            loadInvoice(); // Reload to show new status
+        } catch (e) {
+            console.error("Failed to update status", e);
+            alert("Erreur lors de la mise à jour du statut");
+        }
+    }
+
     if (loading) return <div className="p-8 text-center">Chargement...</div>
     if (!invoice) return null
 
@@ -75,6 +86,16 @@ export default function InvoiceDetailsPage() {
                     </Link>
                 </Button>
                 <div className="flex gap-2">
+                    {invoice.status !== 'PAID' && (
+                        <Button variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200" onClick={() => updateStatus('PAID')}>
+                            <CheckCircle className="mr-2 h-4 w-4" /> Marquer Payée
+                        </Button>
+                    )}
+                    {invoice.status !== 'CANCELLED' && (
+                        <Button variant="outline" className="text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => updateStatus('CANCELLED')}>
+                            <XCircle className="mr-2 h-4 w-4" /> Annuler
+                        </Button>
+                    )}
                     <Button variant="outline" onClick={() => window.print()}>
                         <Printer className="mr-2 h-4 w-4" /> Imprimer
                     </Button>

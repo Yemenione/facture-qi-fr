@@ -17,7 +17,7 @@ export default function DashboardLayout({
                         </div>
                     </div>
                 </div>
-                <div className="flex overflow-hidden bg-background h-[calc(100vh-4rem)]">
+                <div className="flex overflow-hidden bg-slate-50/50 h-[calc(100vh-4rem)]">
                     <aside className="hidden w-64 overflow-y-auto border-r bg-gray-50/40 md:block relative">
                         <Sidebar />
                     </aside>

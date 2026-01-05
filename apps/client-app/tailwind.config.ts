@@ -20,6 +20,9 @@ const config = {
             fontFamily: {
                 sans: ["var(--font-inter)", ...fontFamily.sans],
             },
+            animation: {
+                'pulse-slow': 'pulse 10s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
             colors: {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",

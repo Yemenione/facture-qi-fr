@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL + '/invoices';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + '/invoices';
 
-export interface InvoiceItem {
+export interface InvoiceItemDto {
     description: string;
     quantity: number;
     unitPrice: number;
@@ -11,7 +11,9 @@ export interface InvoiceItem {
 
 export interface CreateInvoiceDto {
     clientId: string;
-    items: InvoiceItem[];
+    items: InvoiceItemDto[];
+    type?: 'INVOICE' | 'QUOTE' | 'CREDIT_NOTE';
+    validityDate?: Date;
     dueDate?: string;
 }
 
@@ -19,6 +21,14 @@ const invoiceService = {
     create: async (data: CreateInvoiceDto) => {
         const token = localStorage.getItem('access_token');
         const response = await axios.post(API_URL, data, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    update: async (id: string, data: Partial<CreateInvoiceDto>) => {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.patch(`${API_URL}/${id}`, data, {
             headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;
@@ -36,6 +46,14 @@ const invoiceService = {
         const token = localStorage.getItem('access_token');
         const response = await axios.get(`${API_URL}/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    async updateStatus(id: string, status: string) {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.patch(`${API_URL}/${id}/status`, { status }, {
+            headers: { Authorization: `Bearer ${token}` }
         });
         return response.data;
     },

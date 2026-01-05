@@ -15,8 +15,8 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="fr">
-            <body className={inter.className}>{children}</body>
+        <html lang="fr-FR" dir="ltr">
+            <body className={inter.className} style={{ fontVariantNumeric: 'lining-nums' }}>{children}</body>
         </html>
     )
 }
