@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/card"
 
 
-import clientService from "@/services/client.service"
+import { clientService } from "@/services/client.service"
 import invoiceService from "@/services/invoice.service"
 import { formatCurrency } from "@/lib/utils"
 
@@ -39,7 +39,7 @@ export default function NewInvoicePage() {
 
     const loadClients = async () => {
         try {
-            const data = await clientService.findAll()
+            const data = await clientService.getAll()
             setClients(data)
         } catch (error) {
             console.error("Failed to load clients", error)

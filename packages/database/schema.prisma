@@ -40,7 +40,9 @@ model Company {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   siren           String   @unique // French Business ID
+  siret           String?  // SIRET (14 digits)
   vatNumber       String?  // TVA Intracommunautaire
+  vatSystem       String?  // 'FRANCHISE', 'REAL_NORMAL', 'REAL_SIMPLIFIED'
   email           String?
   phone           String?
   address         Json     // { street, city, zip, country }
@@ -55,6 +57,22 @@ model Company {
   // Settings
   legalMentions   String?  // Mention légale par défaut bas de page
   facturXProfile  String   @default("BASIC") // BASIC, EN_16931, EXTENDED
+  
+  // Mandatory Legal Mentions 2026
+  capital         String?  // Capital social (ex: "1000")
+  rcs             String?  // Ville d'immatriculation (ex: "Paris")
+  iban            String?
+  bic             String?
+  penalties       String?  // Taux de pénalités (ex: "3 fois le taux d'intérêt légal")
+
+  // Extended Company Data (Legal/Activity)
+  legalForm       String?  // e.g. "Entrepreneur individuel", "SARL"...
+  nafCode         String?  // e.g. "53.20Z"
+  activityLabel   String?  // e.g. "Autres activités de poste et de courrier"
+  managerName     String?  // e.g. "Jean Dupont"
+  rcsNumber       String?  // Inscription
+  creationDate    DateTime? // Date de création
+  category        String?  // PME, ETI...
   
   // Relations
   users           User[]
@@ -100,6 +118,10 @@ model Client {
   name        String   
   isBusiness  Boolean  @default(true)
   siren       String?
+  siret       String?
+  legalForm   String?
+  nafCode     String?
+  vatSystem   String?
   vatNumber   String?
   email       String
   phone       String?
@@ -110,6 +132,7 @@ model Client {
   invoices    Invoice[]
   
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Product {

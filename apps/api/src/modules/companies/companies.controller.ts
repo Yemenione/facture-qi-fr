@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Patch, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Body, Patch, UseGuards, Request, Param } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -16,5 +16,9 @@ export class CompaniesController {
     @Patch('me')
     update(@Request() req, @Body() updateCompanyDto: UpdateCompanyDto) {
         return this.companiesService.update(req.user.companyId, updateCompanyDto);
+    }
+    @Get('search-siret/:siret')
+    searchSiret(@Param('siret') siret: string) {
+        return this.companiesService.searchSiret(siret);
     }
 }

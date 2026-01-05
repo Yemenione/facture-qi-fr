@@ -1,28 +1,67 @@
-import { IsString, IsEmail, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsBoolean, IsNotEmpty, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class AddressDto {
+    @IsString()
+    @IsOptional()
+    street?: string;
+
+    @IsString()
+    @IsOptional()
+    city?: string;
+
+    @IsString()
+    @IsOptional()
+    zip?: string;
+
+    @IsString()
+    @IsOptional()
+    country?: string;
+}
 
 export class CreateClientDto {
     @IsString()
+    @IsNotEmpty()
     name: string;
 
-    @IsEmail()
-    email: string;
-
-    @IsOptional()
     @IsBoolean()
+    @IsOptional()
     isBusiness?: boolean;
 
-    @IsOptional()
     @IsString()
+    @IsOptional()
     siren?: string;
 
-    @IsOptional()
     @IsString()
+    @IsOptional()
+    siret?: string;
+
+    @IsString()
+    @IsOptional()
+    legalForm?: string;
+
+    @IsString()
+    @IsOptional()
+    nafCode?: string;
+
+    @IsString()
+    @IsOptional()
+    vatSystem?: string;
+
+    @IsString()
+    @IsOptional()
     vatNumber?: string;
 
-    @IsOptional()
+    @IsEmail()
+    @IsNotEmpty()
+    email: string;
+
     @IsString()
+    @IsOptional()
     phone?: string;
 
     @IsOptional()
-    address?: any;
+    @ValidateNested()
+    @Type(() => AddressDto)
+    address?: AddressDto;
 }

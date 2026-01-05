@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
     LayoutDashboard,
     FileText,
@@ -19,7 +19,14 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 export function Sidebar({ className }: SidebarProps) {
     const pathname = usePathname()
+    const router = useRouter()
     const { logout } = useAuthStore()
+
+    const handleLogout = () => {
+        logout()
+        router.refresh()
+        router.push("/")
+    }
 
     const routes = [
         {
@@ -79,7 +86,11 @@ export function Sidebar({ className }: SidebarProps) {
                 </div>
             </div>
             <div className="px-3 py-2 mt-auto absolute bottom-4 w-full">
-                <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => logout()}>
+                <Button
+                    variant="ghost"
+                    className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+                    onClick={handleLogout}
+                >
                     <LogOut className="mr-2 h-4 w-4" />
                     Déconnexion
                 </Button>

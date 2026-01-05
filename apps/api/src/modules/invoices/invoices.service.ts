@@ -104,7 +104,7 @@ export class InvoicesService {
     async findOne(companyId: string, id: string) {
         return this.prisma.invoice.findFirst({
             where: { id, companyId },
-            include: { client: true, items: true }
+            include: { client: true, items: true, company: true }
         });
     }
 }

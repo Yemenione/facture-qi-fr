@@ -11,6 +11,10 @@ export class UpdateCompanyDto {
 
     @IsString()
     @IsOptional()
+    siret?: string;
+
+    @IsString()
+    @IsOptional()
     vatNumber?: string;
 
     @IsEmail()
@@ -27,6 +31,30 @@ export class UpdateCompanyDto {
 
     @IsString()
     @IsOptional()
+    capital?: string;
+
+    @IsString()
+    @IsOptional()
+    rcs?: string;
+
+    @IsString()
+    @IsOptional()
+    iban?: string;
+
+    @IsString()
+    @IsOptional()
+    bic?: string;
+
+    @IsString()
+    @IsOptional()
+    legalMentions?: string;
+
+    @IsString()
+    @IsOptional()
+    penalties?: string;
+
+    @IsString()
+    @IsOptional()
     city?: string;
 
     @IsString()
@@ -40,4 +68,36 @@ export class UpdateCompanyDto {
     @IsString()
     @IsOptional()
     logoUrl?: string;
+
+    @IsString()
+    @IsOptional()
+    vatSystem?: string;
+
+    @IsString()
+    @IsOptional()
+    legalForm?: string;
+
+    @IsString()
+    @IsOptional()
+    nafCode?: string;
+
+    @IsString()
+    @IsOptional()
+    activityLabel?: string;
+
+    @IsString()
+    @IsOptional()
+    managerName?: string;
+
+    @IsString()
+    @IsOptional()
+    rcsNumber?: string;
+
+    @IsString()
+    @IsOptional()
+    creationDate?: string; // ISO String
+
+    @IsString()
+    @IsOptional()
+    category?: string;
 }

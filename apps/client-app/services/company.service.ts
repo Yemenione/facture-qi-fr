@@ -6,7 +6,9 @@ export interface Company {
     id: string;
     name: string;
     siren?: string;
+    siret?: string;
     vatNumber?: string;
+    vatSystem?: string;
     email?: string;
     phone?: string;
     address?: any;
@@ -14,7 +16,7 @@ export interface Company {
 }
 
 const getAuthHeader = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     return { Authorization: `Bearer ${token}` };
 };
 
@@ -28,6 +30,13 @@ const companyService = {
 
     update: async (data: Partial<Company>): Promise<Company> => {
         const response = await axios.patch(`${API_URL}/companies/me`, data, {
+            headers: getAuthHeader(),
+        });
+        return response.data;
+    },
+
+    searchSiret: async (siret: string): Promise<Partial<Company>> => {
+        const response = await axios.get(`${API_URL}/companies/search-siret/${siret}`, {
             headers: getAuthHeader(),
         });
         return response.data;

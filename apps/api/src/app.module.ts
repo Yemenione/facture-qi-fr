@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaModule } from './prisma/prisma.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ClientsModule } from './modules/clients/clients.module';
@@ -11,6 +11,7 @@ import { PdfModule } from './modules/pdf/pdf.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module';
 import { AdminCompaniesModule } from './modules/admin-companies/admin-companies.module';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { AdminCompaniesModule } from './modules/admin-companies/admin-companies.
             isGlobal: true,
             envFilePath: ['../../.env', '.env'],
         }),
+        PrismaModule,
         AuthModule,
         InvoicesModule,
         ClientsModule,
@@ -28,8 +30,9 @@ import { AdminCompaniesModule } from './modules/admin-companies/admin-companies.
         StatsModule,
         AdminAuthModule,
         AdminCompaniesModule,
+        MailModule,
     ],
-    providers: [PrismaService],
-    exports: [PrismaService],
+    controllers: [],
+    providers: [],
 })
 export class AppModule { }

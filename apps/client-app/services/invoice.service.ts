@@ -47,6 +47,14 @@ const invoiceService = {
             responseType: 'blob',
         });
         return response.data;
+    },
+
+    sendEmail: async (id: string) => {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.post(`${API_URL}/${id}/send`, {}, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
     }
 };
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Plus, Search, MoreHorizontal, Download } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Download, Mail, Eye } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -118,9 +118,28 @@ export default function InvoicesPage() {
                                             </td>
                                             <td className="p-4 align-middle text-right">
                                                 <div className="flex justify-end gap-2">
+                                                    <Button variant="ghost" size="icon" asChild>
+                                                        <Link href={`/dashboard/invoices/${invoice.id}`}>
+                                                            <Eye className="h-4 w-4" />
+                                                            <span className="sr-only">Voir</span>
+                                                        </Link>
+                                                    </Button>
                                                     <Button variant="ghost" size="icon" onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber)}>
                                                         <Download className="h-4 w-4" />
                                                         <span className="sr-only">Télécharger</span>
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" onClick={async () => {
+                                                        if (!confirm(`Envoyer la facture ${invoice.invoiceNumber} au client ?`)) return;
+                                                        try {
+                                                            await invoiceService.sendEmail(invoice.id);
+                                                            alert('Email envoyé avec succès !');
+                                                        } catch (e) {
+                                                            console.error(e);
+                                                            alert('Erreur lors de l\'envoi de l\'email.');
+                                                        }
+                                                    }}>
+                                                        <Mail className="h-4 w-4" />
+                                                        <span className="sr-only">Envoyer par Email</span>
                                                     </Button>
                                                 </div>
                                             </td>

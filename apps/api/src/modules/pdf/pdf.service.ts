@@ -3,7 +3,17 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { Invoice, Company, Client, InvoiceItem } from '@prisma/client';
 
 type FullInvoice = Invoice & {
-    company: Company;
+    company: Company & {
+        siret?: string;
+        capital?: string;
+        rcs?: string;
+        iban?: string;
+        bic?: string;
+        legalMentions?: string;
+        penalties?: string;
+        logoUrl?: string;
+        phone?: string;
+    };
     client: Client;
     items: InvoiceItem[];
 };
@@ -29,6 +39,13 @@ export class PdfService {
 
         // Header - Company Info
         let y = height - 50;
+
+        // Draw Logo if exists (Simplified placeholder text for now, would need image embedding logic)
+        if (invoice.company.logoUrl) {
+            // Would normally fetch and embed image here. 
+            // For now, draw text indicating logo area or just rely on company name
+        }
+
         drawText(invoice.company.name, 50, y, 20, true);
         y -= 25;
         drawText(invoice.company.email || '', 50, y);
@@ -37,6 +54,25 @@ export class PdfService {
         const address: any = invoice.company.address;
         const addressStr = typeof address === 'string' ? address : `${address?.street || ''}, ${address?.city || ''}`;
         drawText(addressStr, 50, y);
+        y -= 15;
+        if (invoice.company.phone) {
+            drawText(`Tel: ${invoice.company.phone}`, 50, y);
+            y -= 15;
+        }
+
+        // Legal Info Header
+        let legalY = y - 10;
+        const legalInfo = [
+            invoice.company.siret ? `SIRET: ${invoice.company.siret}` : '',
+            invoice.company.vatNumber ? `TVA: ${invoice.company.vatNumber}` : '',
+            invoice.company.rcs ? `RCS: ${invoice.company.rcs}` : '',
+            invoice.company.capital ? `Capital: ${invoice.company.capital} €` : ''
+        ].filter(Boolean).join(' - ');
+
+        if (legalInfo) {
+            drawText(legalInfo, 50, legalY, 8);
+        }
+
         y -= 30;
 
         // Invoice Details
@@ -45,16 +81,17 @@ export class PdfService {
         drawText(`Échéance: ${new Date(invoice.dueDate).toLocaleDateString('fr-FR')}`, 400, height - 85);
 
         // Client Info
-        y = height - 150;
+        y = height - 160;
         drawText("FACTURER À:", 50, y, 12, true);
         y -= 20;
-        drawText(invoice.client.name, 50, y, 14, true);
+        drawText(invoice.client.name, 50, y, 12, true);
         y -= 15;
-        drawText(invoice.client.email || '', 50, y);
         const clientAddr: any = invoice.client.address;
-        const clientAddressStr = typeof clientAddr === 'string' ? clientAddr : `${clientAddr?.street || ''}, ${clientAddr?.city || ''}`;
-        y -= 15;
-        drawText(clientAddressStr, 50, y);
+        if (clientAddr) {
+            drawText(typeof clientAddr === 'string' ? clientAddr : `${clientAddr.street || ''}`, 50, y);
+            y -= 15;
+            drawText(typeof clientAddr === 'string' ? '' : `${clientAddr.zip || ''} ${clientAddr.city || ''}`, 50, y);
+        }
 
         // Items Table Header
         y = height - 250;

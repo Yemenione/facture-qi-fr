@@ -70,12 +70,68 @@ export class AuthService {
             role: user.role
         };
 
+        return this.generateJwt(user);
+    }
+
+    async validateOAuthUser(profile: any) {
+        let user = await this.prisma.user.findUnique({ where: { email: profile.email } });
+
+        if (!user) {
+            // Auto-register logic for Google Users
+            const result = await this.prisma.$transaction(async (tx) => {
+                let plan = await tx.subscriptionPlan.findFirst({ where: { code: 'FREE' } });
+                if (!plan) {
+                    plan = await tx.subscriptionPlan.create({
+                        data: { code: 'FREE', name: 'Freemium', priceMonthly: 0, maxInvoices: 10, maxUsers: 1, features: {} }
+                    });
+                }
+
+                const company = await tx.company.create({
+                    data: {
+                        name: `${profile.firstName} ${profile.lastName} Company`,
+                        siren: Math.floor(Math.random() * 1000000000).toString().padStart(9, '0'), // Random temporary SIREN
+                        planId: plan.id,
+                        subscriptionStatus: 'ACTIVE',
+                        address: {},
+                    }
+                });
+
+                const randomPassword = Math.random().toString(36).slice(-8);
+                const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+                return tx.user.create({
+                    data: {
+                        email: profile.email,
+                        password: hashedPassword,
+                        firstName: profile.firstName,
+                        lastName: profile.lastName,
+                        role: 'ADMIN',
+                        companyId: company.id,
+                        // googleId: profile.googleId // If you add googleId to schema later
+                    }
+                });
+            });
+            user = result;
+        }
+
+        return this.generateJwt(user);
+    }
+
+    private generateJwt(user: any) {
+        const payload = {
+            sub: user.id,
+            email: user.email,
+            companyId: user.companyId,
+            role: user.role
+        };
+
         return {
             access_token: this.jwtService.sign(payload),
             user: {
                 id: user.id,
                 email: user.email,
                 firstName: user.firstName,
+                lastName: user.lastName,
                 role: user.role
             }
         };

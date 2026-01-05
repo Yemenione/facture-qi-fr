@@ -1,0 +1,318 @@
+[2026-01-05T02:51:54.163Z] Received Create Client Request {
+  "dto": {
+    "name": "Shihab Al hajj",
+    "email": "shihabhajbe@gmail.com",
+    "isBusiness": true,
+    "siren": "929275873",
+    "siret": "92927587300016",
+    "vatNumber": "FR04929275873",
+    "legalForm": "1000",
+    "nafCode": "53.20Z",
+    "vatSystem": "",
+    "phone": "0780664003",
+    "address": {
+      "street": "1 Rue des Primevères",
+      "city": "Montreuil",
+      "zip": "93100",
+      "country": "France"
+    }
+  }
+}
+[2026-01-05T02:51:54.178Z] Error Creating Client {
+  "message": "\nInvalid `this.prisma.user.findUnique()` invocation in\nC:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\src\\modules\\clients\\clients.service.ts:12:45\n\n   9 \n  10 async create(userId: string, createClientDto: CreateClientDto) {\n  11     // Get user's company\n→ 12     const user = await this.prisma.user.findUnique({\n           where: {\n             id: undefined,\n         ?   email?: String,\n         ?   AND?: UserWhereInput | UserWhereInput[],\n         ?   OR?: UserWhereInput[],\n         ?   NOT?: UserWhereInput | UserWhereInput[],\n         ?   password?: StringFilter | String,\n         ?   firstName?: StringFilter | String,\n         ?   lastName?: StringFilter | String,\n         ?   role?: EnumUserRoleFilter | UserRole,\n         ?   companyId?: StringFilter | String,\n         ?   createdAt?: DateTimeFilter | DateTime,\n         ?   company?: CompanyRelationFilter | CompanyWhereInput\n           }\n         })\n\nArgument `where` of type UserWhereUniqueInput needs at least one of `id` or `email` arguments. Available options are marked with ?.",
+  "stack": "PrismaClientValidationError: \nInvalid `this.prisma.user.findUnique()` invocation in\nC:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\src\\modules\\clients\\clients.service.ts:12:45\n\n   9 \n  10 async create(userId: string, createClientDto: CreateClientDto) {\n  11     // Get user's company\n→ 12     const user = await this.prisma.user.findUnique({\n           where: {\n             id: undefined,\n         ?   email?: String,\n         ?   AND?: UserWhereInput | UserWhereInput[],\n         ?   OR?: UserWhereInput[],\n         ?   NOT?: UserWhereInput | UserWhereInput[],\n         ?   password?: StringFilter | String,\n         ?   firstName?: StringFilter | String,\n         ?   lastName?: StringFilter | String,\n         ?   role?: EnumUserRoleFilter | UserRole,\n         ?   companyId?: StringFilter | String,\n         ?   createdAt?: DateTimeFilter | DateTime,\n         ?   company?: CompanyRelationFilter | CompanyWhereInput\n           }\n         })\n\nArgument `where` of type UserWhereUniqueInput needs at least one of `id` or `email` arguments. Available options are marked with ?.\n    at wn (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n    at $n.handleRequestError (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:121:6958)\n    at $n.handleAndLogRequestError (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:121:6623)\n    at $n.request (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:121:6307)\n    at async l (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:130:9633)\n    at async ClientsService.create (C:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\src\\modules\\clients\\clients.service.ts:12:22)\n    at async ClientsController.create (C:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\src\\modules\\clients\\clients.controller.ts:30:28)\n    at async C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+}
+[2026-01-05T02:52:24.652Z] Received Create Client Request {
+  "dto": {
+    "name": "Shihab Al hajj",
+    "email": "shihabhajbe@gmail.com",
+    "isBusiness": true,
+    "siren": "929275873",
+    "siret": "92927587300016",
+    "vatNumber": "FR04929275873",
+    "legalForm": "1000",
+    "nafCode": "53.20Z",
+    "vatSystem": "",
+    "phone": "0780664003",
+    "address": {
+      "street": "1 Rue des Primevères",
+      "city": "Montreuil",
+      "zip": "93100",
+      "country": "France"
+    }
+  }
+}
+[2026-01-05T02:52:24.656Z] Error Creating Client {
+  "message": "\nInvalid `this.prisma.user.findUnique()` invocation in\nC:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\src\\modules\\clients\\clients.service.ts:12:45\n\n   9 \n  10 async create(userId: string, createClientDto: CreateClientDto) {\n  11     // Get user's company\n→ 12     const user = await this.prisma.user.findUnique({\n           where: {\n             id: undefined,\n         ?   email?: String,\n         ?   AND?: UserWhereInput | UserWhereInput[],\n         ?   OR?: UserWhereInput[],\n         ?   NOT?: UserWhereInput | UserWhereInput[],\n         ?   password?: StringFilter | String,\n         ?   firstName?: StringFilter | String,\n         ?   lastName?: StringFilter | String,\n         ?   role?: EnumUserRoleFilter | UserRole,\n         ?   companyId?: StringFilter | String,\n         ?   createdAt?: DateTimeFilter | DateTime,\n         ?   company?: CompanyRelationFilter | CompanyWhereInput\n           }\n         })\n\nArgument `where` of type UserWhereUniqueInput needs at least one of `id` or `email` arguments. Available options are marked with ?.",
+  "stack": "PrismaClientValidationError: \nInvalid `this.prisma.user.findUnique()` invocation in\nC:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\src\\modules\\clients\\clients.service.ts:12:45\n\n   9 \n  10 async create(userId: string, createClientDto: CreateClientDto) {\n  11     // Get user's company\n→ 12     const user = await this.prisma.user.findUnique({\n           where: {\n             id: undefined,\n         ?   email?: String,\n         ?   AND?: UserWhereInput | UserWhereInput[],\n         ?   OR?: UserWhereInput[],\n         ?   NOT?: UserWhereInput | UserWhereInput[],\n         ?   password?: StringFilter | String,\n         ?   firstName?: StringFilter | String,\n         ?   lastName?: StringFilter | String,\n         ?   role?: EnumUserRoleFilter | UserRole,\n         ?   companyId?: StringFilter | String,\n         ?   createdAt?: DateTimeFilter | DateTime,\n         ?   company?: CompanyRelationFilter | CompanyWhereInput\n           }\n         })\n\nArgument `where` of type UserWhereUniqueInput needs at least one of `id` or `email` arguments. Available options are marked with ?.\n    at wn (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:29:1363)\n    at $n.handleRequestError (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:121:6958)\n    at $n.handleAndLogRequestError (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:121:6623)\n    at $n.request (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:121:6307)\n    at async l (C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@prisma\\client\\runtime\\library.js:130:9633)\n    at async ClientsService.create (C:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\src\\modules\\clients\\clients.service.ts:12:22)\n    at async ClientsController.create (C:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\src\\modules\\clients\\clients.controller.ts:30:28)\n    at async C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@nestjs\\core\\router\\router-execution-context.js:46:28\n    at async C:\\Users\\alaza\\Desktop\\factuer fr\\node_modules\\@nestjs\\core\\router\\router-proxy.js:9:17"
+}
+[2026-01-05T02:53:07.220Z] Received Create Client Request {
+  "userId": "695b0cd78cff34f12764d2b6",
+  "dto": {
+    "name": "Shihab Al hajj",
+    "email": "shihabhajbe@gmail.com",
+    "isBusiness": true,
+    "siren": "929275873",
+    "siret": "92927587300016",
+    "vatNumber": "FR04929275873",
+    "legalForm": "1000",
+    "nafCode": "53.20Z",
+    "vatSystem": "",
+    "phone": "0780664003",
+    "address": {
+      "street": "1 Rue des Primevères",
+      "city": "Montreuil",
+      "zip": "93100",
+      "country": "France"
+    }
+  }
+}
+[2026-01-05T02:53:07.376Z] Client Created Successfully {
+  "id": "695b27936a77555e023b4d6b"
+}
+[2026-01-05T02:53:40.081Z] Received Create Client Request {
+  "userId": "695b0cd78cff34f12764d2b6",
+  "dto": {
+    "name": "Shihab Al hajj",
+    "email": "shihabhajbe@gmail.com",
+    "isBusiness": true,
+    "siren": "929275873",
+    "siret": "92927587300016",
+    "vatNumber": "FR04929275873",
+    "legalForm": "1000",
+    "nafCode": "53.20Z",
+    "vatSystem": "",
+    "phone": "0780664003",
+    "address": {
+      "street": "1 Rue des Primevères",
+      "city": "Montreuil",
+      "zip": "93100",
+      "country": "France"
+    }
+  }
+}
+[2026-01-05T02:53:40.121Z] Client Created Successfully {
+  "id": "695b27b46a77555e023b4d6c"
+}
+[2026-01-05T02:54:26.977Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:27.072Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:29.954Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:29.983Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:45.884Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:45.914Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:48.086Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:48.112Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:56.671Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:54:56.700Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:55:28.157Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:55:28.231Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:55:53.125Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:55:53.167Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:00.393Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:00.423Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:12.719Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:12.744Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:15.845Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:15.893Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:26.415Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:26.449Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:46.227Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:46.254Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:55.167Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:56:55.192Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:09.639Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:09.667Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:12.884Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:12.914Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:28.418Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:28.440Z] FindAll Clients Result {
+  "count": 0
+}
+[2026-01-05T02:57:28.444Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:28.466Z] FindAll Clients Result {
+  "count": 0
+}
+[2026-01-05T02:57:32.477Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:32.500Z] FindAll Clients Result {
+  "count": 0
+}
+[2026-01-05T02:57:32.504Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:32.530Z] FindAll Clients Result {
+  "count": 0
+}
+[2026-01-05T02:57:50.766Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:50.791Z] FindAll Clients Result {
+  "count": 0
+}
+[2026-01-05T02:57:50.795Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:57:50.818Z] FindAll Clients Result {
+  "count": 0
+}
+[2026-01-05T02:58:01.239Z] Received Create Client Request {
+  "userId": "695b0cd78cff34f12764d2b6",
+  "dto": {
+    "name": "Shihab Al hajj",
+    "email": "shihabhajbe@gmail.com",
+    "isBusiness": true,
+    "siren": "929275873",
+    "siret": "92927587300016",
+    "vatNumber": "FR04929275873",
+    "legalForm": "1000",
+    "nafCode": "53.20Z",
+    "vatSystem": "",
+    "phone": "0780664003",
+    "address": {
+      "street": "1 Rue des Primevères",
+      "city": "Montreuil",
+      "zip": "93100",
+      "country": "France"
+    }
+  }
+}
+[2026-01-05T02:58:01.293Z] Client Created Successfully {
+  "id": "695b28b947930ffd2bf46eae"
+}
+[2026-01-05T02:58:01.309Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:58:01.331Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T02:58:01.337Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T02:58:01.361Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:00:37.615Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:00:37.685Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:00:37.688Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:00:37.716Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:00:42.291Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:00:42.314Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:00:42.318Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:00:42.340Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:03:40.643Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:03:40.712Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:03:40.716Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:03:40.738Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:05:14.917Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:05:15.018Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:05:15.022Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:05:15.049Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:07:06.107Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:07:06.186Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-05T03:07:06.192Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-05T03:07:06.210Z] FindAll Clients Result {
+  "count": 1
+}
