@@ -61,8 +61,55 @@ export class FacturXGeneratorService {
     private async generateVisualPdf(inv: any): Promise<Buffer> {
         const pdfDoc = await PDFDocument.create();
         const page = pdfDoc.addPage();
-        page.drawText(`FACTURE N° ${inv.invoiceNumber}`, { x: 50, y: 700 });
-        page.drawText(`MONTANT TTC: ${inv.total} EUR`, { x: 50, y: 650 });
+        const { width, height } = page.getSize();
+        const fontSize = 10;
+
+        // --- Header ---
+        page.drawText(inv.company?.name || 'Ma Société', { x: 50, y: height - 50, size: 20 });
+        page.drawText(inv.company?.email || 'contact@company.com', { x: 50, y: height - 70, size: 10 });
+
+        // --- Client Info ---
+        page.drawText('Facturer à:', { x: 400, y: height - 50, size: 12 });
+        page.drawText(inv.client?.name || 'Client Inconnu', { x: 400, y: height - 70, size: 10 });
+        page.drawText(inv.client?.email || '', { x: 400, y: height - 85, size: 10 });
+
+        // --- Invoice Meta ---
+        page.drawText(`FACTURE N° ${inv.invoiceNumber}`, { x: 50, y: height - 120, size: 14 });
+        page.drawText(`Date: ${new Date(inv.issueDate).toLocaleDateString('fr-FR')}`, { x: 50, y: height - 140, size: 10 });
+
+        // --- Table Headers ---
+        const tableTop = height - 200;
+        page.drawText('Description', { x: 50, y: tableTop, size: 10 });
+        page.drawText('Qté', { x: 300, y: tableTop, size: 10 });
+        page.drawText('Prix U. HT', { x: 350, y: tableTop, size: 10 });
+        page.drawText('Total HT', { x: 450, y: tableTop, size: 10 });
+
+        page.drawLine({
+            start: { x: 50, y: tableTop - 5 },
+            end: { x: 550, y: tableTop - 5 },
+            thickness: 1,
+        });
+
+        // --- Items ---
+        let yPosition = tableTop - 25;
+        inv.items.forEach((item: any) => {
+            page.drawText(item.description.substring(0, 40), { x: 50, y: yPosition, size: 10 });
+            page.drawText(item.quantity.toString(), { x: 300, y: yPosition, size: 10 });
+            page.drawText(item.unitPrice.toFixed(2), { x: 350, y: yPosition, size: 10 });
+            page.drawText((item.quantity * item.unitPrice).toFixed(2), { x: 450, y: yPosition, size: 10 });
+            yPosition -= 20;
+        });
+
+        // --- Totals ---
+        const totalY = yPosition - 30;
+        page.drawText(`Total HT: ${inv.subTotal.toFixed(2)} €`, { x: 400, y: totalY, size: 12 });
+        page.drawText(`TVA: ${inv.taxAmount.toFixed(2)} €`, { x: 400, y: totalY - 20, size: 12 });
+        page.drawText(`Total TTC: ${inv.total.toFixed(2)} €`, { x: 400, y: totalY - 40, size: 14 });
+
+        // --- Footer ---
+        page.drawText('Merci de votre confiance.', { x: 50, y: 50, size: 10 });
+        page.drawText('Généré par Invoicer FR - Conforme Factur-X 2026', { x: 50, y: 30, size: 8, opacity: 0.5 });
+
         return Buffer.from(await pdfDoc.save());
     }
 

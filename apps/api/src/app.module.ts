@@ -12,6 +12,8 @@ import { StatsModule } from './modules/stats/stats.module';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module';
 import { AdminCompaniesModule } from './modules/admin-companies/admin-companies.module';
 import { MailModule } from './modules/mail/mail.module';
+import { TemplatesModule } from './modules/templates/templates.module';
+import { CompanySettingsModule } from './modules/company-settings/company-settings.module';
 
 @Module({
     imports: [
@@ -30,6 +32,8 @@ import { MailModule } from './modules/mail/mail.module';
         StatsModule,
         AdminAuthModule,
         AdminCompaniesModule,
+        TemplatesModule,
+        CompanySettingsModule,
         MailModule,
     ],
     controllers: [],

@@ -8,9 +8,13 @@ async function bootstrap() {
     // Enable Global Validation Pipe
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
+    // Global Error Logging
+    const { AllExceptionsFilter } = require('./common/filters/all-exceptions.filter');
+    app.useGlobalFilters(new AllExceptionsFilter());
+
     // Enable CORS for Frontend Access
     app.enableCors({
-        origin: ['http://localhost:3000', 'http://localhost:5173', 'https://app.mon-saas.fr', 'https://admin.mon-saas.fr'],
+        origin: true, // Allow all for debugging
         credentials: true,
     });
 

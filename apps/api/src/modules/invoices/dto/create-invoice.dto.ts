@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsArray, ValidateNested, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray, ValidateNested, IsNumber, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class InvoiceItemDto {
@@ -25,4 +25,21 @@ export class CreateInvoiceDto {
     @ValidateNested({ each: true })
     @Type(() => InvoiceItemDto)
     items: InvoiceItemDto[];
+
+    @IsOptional()
+    @IsString()
+    type?: 'INVOICE' | 'QUOTE' | 'CREDIT_NOTE'; // Using string union to avoid importing backend enum if tricky, or stick to string for DTO simplicity
+
+    @IsOptional()
+    @IsOptional()
+    @Type(() => Date)
+    validityDate?: Date;
+
+    @IsOptional()
+    @Type(() => Date)
+    issueDate?: Date;
+
+    @IsOptional()
+    @Type(() => Date)
+    dueDate?: Date;
 }

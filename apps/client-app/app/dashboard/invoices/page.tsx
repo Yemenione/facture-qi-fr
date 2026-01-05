@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Plus, Search, MoreHorizontal, Download, Mail, Eye, FileText, FileClock, FileWarning, Pencil } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Download, Mail, Eye, FileText, FileClock, FileWarning, Pencil, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -58,6 +58,24 @@ export default function InvoicesPage() {
             alert("Email envoyé avec succès !");
         } catch (e) {
             alert("Erreur lors de l'envoi de l'email.");
+        }
+    }
+
+    const deleteInvoice = async (id: string, invoiceNumber: string) => {
+        if (!confirm(`Êtes-vous sûr de vouloir supprimer ${invoiceNumber} ?`)) return;
+
+        try {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoices/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            alert("Facture supprimée avec succès!");
+            loadInvoices(); // Reload list
+        } catch (error) {
+            console.error("Delete failed", error);
+            alert("Erreur lors de la suppression");
         }
     }
 
@@ -198,6 +216,12 @@ export default function InvoicesPage() {
                                                 <Button variant="ghost" size="icon" onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber)} className="hover:text-slate-900">
                                                     <Download className="h-4 w-4" />
                                                 </Button>
+
+                                                {invoice.status === 'DRAFT' && (
+                                                    <Button variant="ghost" size="icon" onClick={() => deleteInvoice(invoice.id, invoice.invoiceNumber)} className="hover:text-red-600">
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

@@ -79,6 +79,8 @@ model Company {
   clients         Client[]
   invoices        Invoice[]
   products        Product[]
+  templates       InvoiceTemplate[]
+  settings        CompanySettings?
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -157,50 +159,58 @@ enum InvoiceStatus {
   PARTIALLY_PAID
   PAID
   OVERDUE     // En retard
-  CANCELLED   // Annulé (Nécessite Avoir)
+  CANCELLED   // Annulé
 }
 
-enum InvoiceType {
+enum DocumentType {
   INVOICE
-  CREDIT_NOTE // Avoir
   QUOTE       // Devis
+  CREDIT_NOTE // Avoir
 }
 
 model Invoice {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
   
   // Chrono Sequence (Must be unique per Company + Year)
-  seqNumber       Int           // 1, 2, 3...
-  invoiceNumber   String        // "2026-F001" (Generated at validation)
+  seqNumber       Int?           // 1, 2, 3... (Optional for Drafts)
+  invoiceNumber   String         @unique // "2026-F001"
   
-  type            InvoiceType   @default(INVOICE)
-  status          InvoiceStatus @default(DRAFT)
+  type            DocumentType   @default(INVOICE)
+  status          InvoiceStatus  @default(DRAFT)
   
-  issueDate       DateTime      @default(now()) // Date d'émission
-  dueDate         DateTime?     // Date d'échéance
-  validationDate  DateTime?     // TIMESTAMP CRITIQUE LOI ANTI-FRAUDE
+  issueDate       DateTime       @default(now())
+  dueDate         DateTime?
+  validityDate    DateTime?      // Pour les Devis (Valid until)
+  validationDate  DateTime?      // Date de validation finale (Factur-X)
   
-  // Amounts
+  // Compliance / Security
+  pdfUrl          String?
+  securityHash    String?
+  previousHash    String?
+  
+  // Financials
   subTotal        Float
   taxAmount       Float
   total           Float
   
-  // Compliance / Security
-  pdfUrl          String?       // Lien S3 vers le PDF/A-3 (Factur-X)
-  securityHash    String?       // SHA-256 Chain of previous invoice hash
-  previousHash    String?       // Hash of the invoice N-1
+  notes           String?
+  terms           String?        // Conditions spécifiques
   
   // Relations
-  clientId        String   @db.ObjectId
-  client          Client   @relation(fields: [clientId], references: [id])
-  companyId       String   @db.ObjectId
-  company         Company  @relation(fields: [companyId], references: [id])
+  clientId        String         @db.ObjectId
+  client          Client         @relation(fields: [clientId], references: [id])
+  
+  companyId       String         @db.ObjectId
+  company         Company        @relation(fields: [companyId], references: [id])
+  
   items           InvoiceItem[]
   
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@unique([companyId, invoiceNumber]) // Unicité du numéro de facture par entreprise
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  @@index([companyId])
+  @@index([clientId])
+  @@unique([companyId, invoiceNumber])
 }
 
 model InvoiceItem {
@@ -214,3 +224,116 @@ model InvoiceItem {
   invoiceId   String   @db.ObjectId
   invoice     Invoice  @relation(fields: [invoiceId], references: [id])
 }
+
+// --------------------------------------
+// INVOICE TEMPLATES & CUSTOMIZATION
+// --------------------------------------
+
+enum TemplateType {
+  CLASSIC
+  MODERN
+  ELEGANT
+  COLORFUL
+}
+
+enum LogoPosition {
+  LEFT
+  CENTER
+  RIGHT
+}
+
+enum HeaderStyle {
+  MINIMAL
+  DETAILED
+  BANNER
+}
+
+model InvoiceTemplate {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String       // "Mon template bleu", "Template entreprise"
+  type        TemplateType @default(CLASSIC)
+  isDefault   Boolean      @default(false)
+  
+  // Customization - Colors
+  primaryColor     String @default("#4F46E5")    // Indigo
+  secondaryColor   String @default("#818CF8")    // Light Indigo
+  textColor        String @default("#1F2937")    // Gray-800
+  backgroundColor  String @default("#FFFFFF")    // White
+  
+  // Logo
+  logoUrl          String?
+  logoPosition     LogoPosition @default(LEFT)
+  logoWidth        Int          @default(150)   // pixels
+  
+  // Typography
+  fontFamily       String @default("Inter")
+  headerFontSize   Int    @default(24)
+  bodyFontSize     Int    @default(14)
+  
+  // Layout
+  headerStyle      HeaderStyle @default(DETAILED)
+  showFooter       Boolean     @default(true)
+  footerText       String?
+  
+  // Legal & Payment
+  legalMentions    String?
+  paymentTermsText String?
+  
+  // Relations
+  companyId   String  @db.ObjectId
+  company     Company @relation(fields: [companyId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([companyId])
+}
+
+// Company Settings for Legal Compliance
+model CompanySettings {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Legal Information (Required for French invoices)
+  legalName   String   // Nom légal complet
+  legalForm   String   // SARL, SAS, EURL, EI, etc.
+  siret       String   @unique
+  vatNumber   String?  // TVA Intracommunautaire
+  
+  // Address
+  address     String
+  postalCode  String
+  city        String
+  country     String   @default("France")
+  
+  // Contact
+  email       String
+  phone       String
+  website     String?
+  
+  // Banking (for invoice payment)
+  iban        String?
+  bic         String?
+  bankName    String?
+  
+  // Legal Details
+  capital     Float?   // Capital social
+  rcs         String?  // RCS Paris B 123 456 789
+  insurance   String?  // Assurance professionnelle
+  
+  // Professional Details
+  nafCode     String?  // Code APE/NAF
+  tvaSystem   String?  // FRANCHISE, NORMAL, SIMPLIFIE
+  
+  // Default Settings
+  defaultPaymentTerms String @default("Paiement à 30 jours")
+  defaultLegalMention String?
+  defaultPenaltyRate  String @default("3 fois le taux d'intérêt légal")
+  
+  // Relations
+  companyId   String   @unique @db.ObjectId
+  company     Company  @relation(fields: [companyId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

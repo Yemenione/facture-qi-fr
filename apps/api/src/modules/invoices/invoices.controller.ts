@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, UseGuards, Request, Res, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, UseGuards, Request, Res, NotFoundException, BadRequestException, Patch, Delete } from '@nestjs/common';
 import { InvoicesService } from './invoices.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -18,6 +18,9 @@ export class InvoicesController {
 
     @Post()
     create(@Request() req, @Body() createInvoiceDto: CreateInvoiceDto) {
+        const fs = require('fs');
+        const logPath = 'C:\\Users\\alaza\\Desktop\\factuer fr\\apps\\api\\invoice_debug.log';
+        fs.appendFileSync(logPath, `${new Date().toISOString()} - Controller Reached! Company: ${req.user.companyId}\n`);
         return this.invoicesService.create(req.user.companyId, createInvoiceDto);
     }
 
@@ -34,6 +37,16 @@ export class InvoicesController {
     @Get(':id')
     findOne(@Request() req, @Param('id') id: string) {
         return this.invoicesService.findOne(req.user.companyId, id);
+    }
+
+    @Patch(':id')
+    update(@Request() req, @Param('id') id: string, @Body() updateInvoiceDto: CreateInvoiceDto) {
+        return this.invoicesService.update(req.user.companyId, id, updateInvoiceDto);
+    }
+
+    @Patch(':id/status')
+    updateStatus(@Request() req, @Param('id') id: string, @Body('status') status: 'PAID' | 'CANCELLED' | 'sent') {
+        return this.invoicesService.updateStatus(req.user.companyId, id, status);
     }
 
     @Get(':id/pdf')
@@ -70,5 +83,10 @@ export class InvoicesController {
         await this.mailService.sendInvoice(invoice.client.email, invoice.invoiceNumber, pdfBuffer);
 
         return { success: true, message: 'Email sent successfully' };
+    }
+
+    @Delete(':id')
+    async delete(@Request() req, @Param('id') id: string) {
+        return this.invoicesService.delete(req.user.companyId, id);
     }
 }
