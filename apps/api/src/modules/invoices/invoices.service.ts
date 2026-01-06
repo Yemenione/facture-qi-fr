@@ -14,11 +14,14 @@ export class InvoicesService {
 
     async create(companyId: string, data: CreateInvoiceDto) {
         try {
-            console.log("Creating invoice for company:", companyId); // Entry log
+            console.log("Creating invoice/quote for company:", companyId);
             const { items, clientId } = data;
 
             // Use Calculator Engine
             const totals = InvoiceCalculator.calculateInvoice(items);
+
+            // Determine prefix based on type
+            const prefix = data.type === 'QUOTE' ? 'DEVIS' : 'DRAFT';
 
             // Force cast to any to bypass TS error temporarily
             return await this.prisma.invoice.create({
@@ -29,8 +32,8 @@ export class InvoicesService {
                     taxAmount: totals.totalVAT,
                     total: totals.totalTTC,
                     seqNumber: 0,
-                    invoiceNumber: `DRAFT-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-                    status: 'DRAFT',
+                    invoiceNumber: `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                    status: 'DRAFT', // Quotes start as DRAFT too
                     type: data.type || 'INVOICE',
                     validityDate: data.validityDate ? new Date(data.validityDate) : undefined,
                     items: {
@@ -64,23 +67,36 @@ export class InvoicesService {
                 include: { client: true, items: true }
             });
 
-            if (!invoice) throw new NotFoundException('Facture introuvable');
+            if (!invoice) throw new NotFoundException('Document introuvable');
             if (invoice.companyId !== companyId) throw new BadRequestException('Accès refusé');
             if (invoice.status !== 'DRAFT') throw new BadRequestException('Déjà validée');
 
             // Sequential Numbering Logic
-            const lastInvoice = await tx.invoice.findFirst({
-                where: { companyId, status: { not: 'DRAFT' } },
+            // SEPARATE SEQUENCE FOR QUOTES vs INVOICES
+            const lastDocument = await tx.invoice.findFirst({
+                where: {
+                    companyId,
+                    type: invoice.type,
+                    status: { not: 'DRAFT' }
+                },
                 orderBy: { seqNumber: 'desc' },
             });
 
-            const nextSeq = (lastInvoice?.seqNumber || 0) + 1;
+            const nextSeq = (lastDocument?.seqNumber || 0) + 1;
             const currentYear = new Date().getFullYear();
-            const invoiceNumber = `${currentYear}-F${nextSeq.toString().padStart(4, '0')}`;
 
-            // Anti-Fraud Chained Hash
-            const prevHash = lastInvoice?.securityHash || 'GENESIS_HASH_START';
-            const dataString = `${invoiceNumber}|${invoice.total}|${invoice.clientId}|${new Date().toISOString()}`;
+            let documentNumber = '';
+            if (invoice.type === 'QUOTE') {
+                documentNumber = `D-${currentYear}-${nextSeq.toString().padStart(4, '0')}`;
+            } else if (invoice.type === 'CREDIT_NOTE') {
+                documentNumber = `AV-${currentYear}-${nextSeq.toString().padStart(4, '0')}`;
+            } else {
+                documentNumber = `${currentYear}-F${nextSeq.toString().padStart(4, '0')}`;
+            }
+
+            // Anti-Fraud Chained Hash (Only strictly required for Invoices/Credit Notes, but good for data integrity)
+            const prevHash = lastDocument?.securityHash || 'GENESIS_HASH_START';
+            const dataString = `${documentNumber}|${invoice.total}|${invoice.clientId}|${new Date().toISOString()}`;
             const securityHash = crypto
                 .createHash('sha256')
                 .update(dataString + prevHash)
@@ -91,7 +107,7 @@ export class InvoicesService {
                 data: {
                     status: 'VALIDATED',
                     seqNumber: nextSeq,
-                    invoiceNumber: invoiceNumber,
+                    invoiceNumber: documentNumber,
                     validationDate: new Date(),
                     previousHash: prevHash,
                     securityHash: securityHash,
@@ -99,6 +115,8 @@ export class InvoicesService {
                 include: { client: true, items: true }
             });
 
+            // Generate PDF (Factur-X only for Invoices)
+            // For Quotes, we might use a different generator or same one adapted
             const pdfUrl = await this.facturXService.generateAndUpload(validatedInvoice);
 
             return tx.invoice.update({
@@ -107,9 +125,13 @@ export class InvoicesService {
             });
         });
     }
-    async findAll(companyId: string) {
+
+    async findAll(companyId: string, type?: 'INVOICE' | 'QUOTE' | 'CREDIT_NOTE') {
         return this.prisma.invoice.findMany({
-            where: { companyId },
+            where: {
+                companyId,
+                ...(type && { type }) // Filter by type if provided
+            },
             include: { client: true },
             orderBy: { createdAt: 'desc' }
         });
@@ -197,5 +219,47 @@ export class InvoicesService {
         return this.prisma.invoice.delete({
             where: { id }
         });
+    }
+
+    async convertToInvoice(companyId: string, quoteId: string) {
+        const quote = await this.findOne(companyId, quoteId);
+        if (!quote) throw new NotFoundException('Devis introuvable');
+        if (quote.type !== 'QUOTE') throw new BadRequestException('Ce document n\'est pas un devis');
+
+        const createInvoiceDto: CreateInvoiceDto = {
+            clientId: quote.clientId,
+            type: 'INVOICE',
+            items: quote.items.map(item => ({
+                description: item.description,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                vatRate: item.vatRate
+            }))
+        };
+
+        return this.create(companyId, createInvoiceDto);
+    }
+
+    async createCreditNote(companyId: string, invoiceId: string) {
+        const invoice = await this.findOne(companyId, invoiceId);
+        if (!invoice) throw new NotFoundException('Facture introuvable');
+        if (invoice.type !== 'INVOICE') throw new BadRequestException('Impossible de créer un avoir sur ce type de document');
+        if (invoice.status === 'DRAFT') throw new BadRequestException('La facture doit être validée avant de créer un avoir');
+
+        // Create Credit Note DTO
+        // Usually Credit Notes have same positive values but Type=CREDIT_NOTE
+        const createInvoiceDto: CreateInvoiceDto = {
+            clientId: invoice.clientId,
+            type: 'CREDIT_NOTE',
+            notes: `Avoir sur la facture Ref: ${invoice.invoiceNumber}`,
+            items: invoice.items.map(item => ({
+                description: item.description,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                vatRate: item.vatRate
+            }))
+        };
+
+        return this.create(companyId, createInvoiceDto);
     }
 }

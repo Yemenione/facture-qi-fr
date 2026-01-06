@@ -20,42 +20,43 @@ type FullInvoice = Invoice & {
 
 @Injectable()
 export class PdfService {
-    async generateInvoice(invoice: FullInvoice): Promise<Uint8Array> {
+    async generateInvoice(invoice: FullInvoice, template?: any): Promise<Uint8Array> {
         const pdfDoc = await PDFDocument.create();
         const page = pdfDoc.addPage();
         const { width, height } = page.getSize();
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-        const drawText = (text: string, x: number, y: number, size = 10, isBold = false) => {
-            page.drawText(text || '', {
-                x,
-                y,
-                size,
-                font: isBold ? fontBold : font,
-                color: rgb(0, 0, 0),
-            });
+        const drawText = (text: string | null | undefined, x: number, y: number, size = 10, isBold = false) => {
+            try {
+                page.drawText(text ? String(text) : '', {
+                    x,
+                    y,
+                    size,
+                    font: isBold ? fontBold : font,
+                    color: rgb(0, 0, 0),
+                });
+            } catch (e) {
+                // Ignore drawing errors
+            }
         };
 
         // Header - Company Info
         let y = height - 50;
 
-        // Draw Logo if exists (Simplified placeholder text for now, would need image embedding logic)
-        if (invoice.company.logoUrl) {
-            // Would normally fetch and embed image here. 
-            // For now, draw text indicating logo area or just rely on company name
-        }
-
-        drawText(invoice.company.name, 50, y, 20, true);
+        drawText(invoice.company?.name || 'Company Name', 50, y, 20, true);
         y -= 25;
-        drawText(invoice.company.email || '', 50, y);
+        drawText(invoice.company?.email || '', 50, y);
         y -= 15;
-        // Check if address is object or string (json field in prisma)
-        const address: any = invoice.company.address;
-        const addressStr = typeof address === 'string' ? address : `${address?.street || ''}, ${address?.city || ''}`;
-        drawText(addressStr, 50, y);
+
+        const address: any = invoice.company?.address;
+        if (address) {
+            const addressStr = typeof address === 'string' ? address : `${address?.street || ''}, ${address?.city || ''}`;
+            drawText(addressStr, 50, y);
+        }
         y -= 15;
-        if (invoice.company.phone) {
+
+        if (invoice.company?.phone) {
             drawText(`Tel: ${invoice.company.phone}`, 50, y);
             y -= 15;
         }
@@ -63,10 +64,10 @@ export class PdfService {
         // Legal Info Header
         let legalY = y - 10;
         const legalInfo = [
-            invoice.company.siret ? `SIRET: ${invoice.company.siret}` : '',
-            invoice.company.vatNumber ? `TVA: ${invoice.company.vatNumber}` : '',
-            invoice.company.rcs ? `RCS: ${invoice.company.rcs}` : '',
-            invoice.company.capital ? `Capital: ${invoice.company.capital} €` : ''
+            invoice.company?.siret ? `SIRET: ${invoice.company.siret}` : '',
+            invoice.company?.vatNumber ? `TVA: ${invoice.company.vatNumber}` : '',
+            invoice.company?.rcs ? `RCS: ${invoice.company.rcs}` : '',
+            invoice.company?.capital ? `Capital: ${invoice.company.capital} €` : ''
         ].filter(Boolean).join(' - ');
 
         if (legalInfo) {
@@ -76,17 +77,18 @@ export class PdfService {
         y -= 30;
 
         // Invoice Details
-        drawText(`FACTURE N° ${invoice.invoiceNumber}`, 400, height - 50, 15, true);
-        drawText(`Date: ${new Date(invoice.issueDate).toLocaleDateString('fr-FR')}`, 400, height - 70);
-        drawText(`Échéance: ${new Date(invoice.dueDate).toLocaleDateString('fr-FR')}`, 400, height - 85);
+        drawText(`FACTURE N° ${invoice.invoiceNumber || 'BROUILLON'}`, 400, height - 50, 15, true);
+        drawText(`Date: ${invoice.issueDate ? new Date(invoice.issueDate).toLocaleDateString('fr-FR') : ''}`, 400, height - 70);
+        drawText(`Échéance: ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('fr-FR') : ''}`, 400, height - 85);
 
         // Client Info
         y = height - 160;
         drawText("FACTURER À:", 50, y, 12, true);
         y -= 20;
-        drawText(invoice.client.name, 50, y, 12, true);
+        drawText(invoice.client?.name || 'Client', 50, y, 12, true);
         y -= 15;
-        const clientAddr: any = invoice.client.address;
+
+        const clientAddr: any = invoice.client?.address;
         if (clientAddr) {
             drawText(typeof clientAddr === 'string' ? clientAddr : `${clientAddr.street || ''}`, 50, y);
             y -= 15;
@@ -95,7 +97,6 @@ export class PdfService {
 
         // Items Table Header
         y = height - 250;
-        // Background for header
         page.drawRectangle({ x: 40, y: y - 5, width: width - 80, height: 20, color: rgb(0.9, 0.9, 0.9) });
 
         drawText("Description", 50, y, 10, true);
@@ -107,20 +108,22 @@ export class PdfService {
 
         // Items
         let subtotal = 0;
-        invoice.items.forEach(item => {
-            const total = item.quantity * item.unitPrice;
-            subtotal += total;
+        if (invoice.items) {
+            invoice.items.forEach(item => {
+                const total = (item.quantity || 0) * (item.unitPrice || 0);
+                subtotal += total;
 
-            drawText(item.description, 50, y);
-            drawText(item.quantity.toString(), 300, y);
-            drawText(`${item.unitPrice.toFixed(2)} €`, 350, y);
-            drawText(`${total.toFixed(2)} €`, 450, y);
+                drawText(item.description || '', 50, y);
+                drawText((item.quantity || 0).toString(), 300, y);
+                drawText(`${(item.unitPrice || 0).toFixed(2)} €`, 350, y);
+                drawText(`${total.toFixed(2)} €`, 450, y);
 
-            y -= 20;
-        });
+                y -= 20;
+            });
+        }
 
         // Totals
-        const vatRate = 0.20; // Hardcoded for simplified example, ideally per item or global setting
+        const vatRate = 0.20;
         const vatAmount = subtotal * vatRate;
         const totalTTC = subtotal + vatAmount;
 
@@ -142,7 +145,9 @@ export class PdfService {
 
         // Footer
         drawText("Merci de votre confiance !", 50, 50, 10, true);
-        drawText(`SIREN: ${invoice.company.siren || 'Non renseigné'}`, 50, 35, 8);
+        if (invoice.company?.siret) {
+            drawText(`SIREN: ${invoice.company.siret}`, 50, 35, 8);
+        }
 
         return pdfDoc.save();
     }

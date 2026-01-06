@@ -31,7 +31,6 @@ export class CreateInvoiceDto {
     type?: 'INVOICE' | 'QUOTE' | 'CREDIT_NOTE'; // Using string union to avoid importing backend enum if tricky, or stick to string for DTO simplicity
 
     @IsOptional()
-    @IsOptional()
     @Type(() => Date)
     validityDate?: Date;
 
@@ -42,4 +41,8 @@ export class CreateInvoiceDto {
     @IsOptional()
     @Type(() => Date)
     dueDate?: Date;
+
+    @IsOptional()
+    @IsString()
+    notes?: string;
 }

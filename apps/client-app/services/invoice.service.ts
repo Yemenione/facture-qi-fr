@@ -34,10 +34,12 @@ const invoiceService = {
         return response.data;
     },
 
-    findAll: async () => {
+    findAll: async (type?: 'INVOICE' | 'QUOTE' | 'CREDIT_NOTE') => {
         const token = localStorage.getItem('access_token');
+        const params = type ? { type } : {};
         const response = await axios.get(API_URL, {
             headers: { Authorization: `Bearer ${token}` },
+            params
         });
         return response.data;
     },
@@ -70,6 +72,30 @@ const invoiceService = {
     sendEmail: async (id: string) => {
         const token = localStorage.getItem('access_token');
         const response = await axios.post(`${API_URL}/${id}/send`, {}, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    convertToInvoice: async (id: string) => {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.post(`${API_URL}/${id}/convert`, {}, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    delete: async (id: string) => {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.delete(`${API_URL}/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    },
+
+    createCreditNote: async (invoiceId: string) => {
+        const token = localStorage.getItem('access_token');
+        const response = await axios.post(`${API_URL}/${invoiceId}/credit-note`, {}, {
             headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;

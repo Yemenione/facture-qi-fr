@@ -41,6 +41,20 @@ const companyService = {
         });
         return response.data;
     },
+
+    uploadLogo: async (file: File): Promise<string> => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await axios.post(`${API_URL}/companies/logo`, formData, {
+            headers: {
+                ...getAuthHeader(),
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        // Returns the updated company, so we can extract logoUrl or backend might return just URL
+        // Based on controller it calls updateLogo which calls prisma.update, so it returns Company object.
+        return response.data.logoUrl;
+    },
 };
 
 export default companyService;

@@ -8,6 +8,8 @@ import { ArrowLeft, Download, Mail, Printer, CheckCircle, XCircle } from "lucide
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import invoiceService from "@/services/invoice.service"
+import templateService from "@/services/template.service"
+import InvoiceRenderer from "@/components/templates/invoice-renderer"
 import { formatCurrency } from "@/lib/utils"
 
 export default function InvoiceDetailsPage() {
@@ -15,18 +17,43 @@ export default function InvoiceDetailsPage() {
     const router = useRouter()
     const id = params.id as string
     const [invoice, setInvoice] = useState<any>(null)
+    const [template, setTemplate] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (id) loadInvoice()
+        if (id) loadData()
     }, [id])
 
-    const loadInvoice = async () => {
+    const loadData = async () => {
         try {
-            const data = await invoiceService.findOne(id)
-            setInvoice(data)
+            const [invoiceData, templates] = await Promise.all([
+                invoiceService.findOne(id),
+                templateService.findAll()
+            ])
+            setInvoice(invoiceData)
+
+            setInvoice(invoiceData)
+
+            // Fallback template if none exists
+            const fallbackTemplate = {
+                fontFamily: 'Inter',
+                primaryColor: '#000000',
+                secondaryColor: '#666666',
+                backgroundColor: '#ffffff',
+                textColor: '#000000',
+                headerStyle: 'DETAILED',
+                logoPosition: 'LEFT',
+                items: []
+            };
+
+            // Find default template or use the first one or fallback
+            const defaultTemplate = (templates && templates.length > 0)
+                ? (templates.find((t: any) => t.isDefault) || templates[0])
+                : fallbackTemplate;
+
+            setTemplate(defaultTemplate)
         } catch (error) {
-            console.error("Failed to load invoice", error)
+            console.error("Failed to load data", error)
             alert("Facture introuvable")
             router.push("/dashboard/invoices")
         } finally {
@@ -66,10 +93,22 @@ export default function InvoiceDetailsPage() {
         if (!confirm(`Changer le statut en ${status} ?`)) return;
         try {
             await invoiceService.updateStatus(id, status);
-            loadInvoice(); // Reload to show new status
+            loadData(); // Reload to show new status
         } catch (e) {
             console.error("Failed to update status", e);
             alert("Erreur lors de la mise à jour du statut");
+        }
+    }
+
+    const handleCreateCreditNote = async () => {
+        if (!confirm("Voulez-vous créer un avenant (Avoir) pour cette facture ?")) return;
+        try {
+            const creditNote = await invoiceService.createCreditNote(id);
+            alert("Avoir créé avec succès !");
+            router.push(`/dashboard/credit-notes/${creditNote.id}/edit`); // Redirect to edit the new credit note
+        } catch (e) {
+            console.error("Failed to create credit note", e);
+            alert("Erreur lors de la création de l'avoir");
         }
     }
 
@@ -91,6 +130,11 @@ export default function InvoiceDetailsPage() {
                             <CheckCircle className="mr-2 h-4 w-4" /> Marquer Payée
                         </Button>
                     )}
+                    {(invoice.status === 'VALIDATED' || invoice.status === 'PAID') && (
+                        <Button variant="outline" className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200" onClick={handleCreateCreditNote}>
+                            <ArrowLeft className="mr-2 h-4 w-4" /> Créer un Avoir
+                        </Button>
+                    )}
                     {invoice.status !== 'CANCELLED' && (
                         <Button variant="outline" className="text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => updateStatus('CANCELLED')}>
                             <XCircle className="mr-2 h-4 w-4" /> Annuler
@@ -109,79 +153,35 @@ export default function InvoiceDetailsPage() {
             </div>
 
             {/* Invoice Preview */}
-            <div className="bg-white border rounded-lg shadow-sm p-8 print:shadow-none print:border-0" id="invoice-preview">
-                {/* Header */}
-                <div className="flex justify-between items-start border-b pb-8 mb-8">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-1">{invoice.company.name}</h1>
-                        <p className="text-sm text-gray-500">{invoice.company.email}</p>
-                        {/* Add Company Address here (need to parse dynamic JSON if needed) */}
-                    </div>
-                    <div className="text-right">
-                        <h2 className="text-xl font-bold text-gray-900">FACTURE</h2>
-                        <p className="text-gray-500">N° {invoice.invoiceNumber}</p>
-                        <p className="text-sm text-gray-500 mt-2">
-                            Date: {new Date(invoice.createdAt).toLocaleDateString()}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Client Info */}
-                <div className="mb-8">
-                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Facturer à</h3>
-                    <div className="text-gray-900 font-medium">{invoice.client.name}</div>
-                    <div className="text-gray-500 text-sm">{invoice.client.email}</div>
-                    {/* Address Display */}
-                    {invoice.client.address && (
-                        <div className="text-gray-500 text-sm mt-1">
-                            {(invoice.client.address as any).street}, {(invoice.client.address as any).zip} {(invoice.client.address as any).city}
-                        </div>
-                    )}
-                </div>
-
-                {/* Items Table */}
-                <table className="w-full mb-8">
-                    <thead>
-                        <tr className="border-b border-gray-200">
-                            <th className="text-left py-3 px-2 font-semibold text-gray-900">Description</th>
-                            <th className="text-right py-3 px-2 font-semibold text-gray-900">Qté</th>
-                            <th className="text-right py-3 px-2 font-semibold text-gray-900">Prix Unit.</th>
-                            <th className="text-right py-3 px-2 font-semibold text-gray-900">TVA</th>
-                            <th className="text-right py-3 px-2 font-semibold text-gray-900">Total HT</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {invoice.items.map((item: any) => (
-                            <tr key={item.id} className="border-b border-gray-100">
-                                <td className="py-3 px-2 text-gray-900">{item.description}</td>
-                                <td className="py-3 px-2 text-right text-gray-600">{item.quantity}</td>
-                                <td className="py-3 px-2 text-right text-gray-600">{formatCurrency(item.unitPrice)}</td>
-                                <td className="py-3 px-2 text-right text-gray-600">{item.vatRate}%</td>
-                                <td className="py-3 px-2 text-right text-gray-900 font-medium">
-                                    {formatCurrency(item.quantity * item.unitPrice)}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                {/* Totals */}
-                <div className="flex justify-end">
-                    <div className="w-64 space-y-2">
-                        <div className="flex justify-between text-sm text-gray-600">
-                            <span>Total HT</span>
-                            <span>{formatCurrency(invoice.subTotal)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm text-gray-600">
-                            <span>TVA</span>
-                            <span>{formatCurrency(invoice.taxAmount)}</span>
-                        </div>
-                        <div className="flex justify-between text-lg font-bold text-gray-900 border-t pt-2 mt-2">
-                            <span>Total TTC</span>
-                            <span>{formatCurrency(invoice.total)}</span>
-                        </div>
-                    </div>
-                </div>
+            <div className="bg-white border rounded-lg shadow-sm print:shadow-none print:border-0 overflow-hidden" id="invoice-preview">
+                {template ? (
+                    <InvoiceRenderer
+                        template={template}
+                        data={{
+                            invoiceNumber: invoice.invoiceNumber,
+                            issueDate: new Date(invoice.createdAt).toLocaleDateString(),
+                            dueDate: invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'Non spécifiée',
+                            companyName: invoice.company.name,
+                            companyAddress: `${(invoice.company.address as any)?.street || ''}, ${(invoice.company.address as any)?.zip || ''} ${(invoice.company.address as any)?.city || ''}`,
+                            companyEmail: invoice.company.email,
+                            companyPhone: invoice.company.phone,
+                            clientName: invoice.client.name,
+                            clientAddress: `${(invoice.client.address as any)?.street || ''}, ${(invoice.client.address as any)?.zip || ''} ${(invoice.client.address as any)?.city || ''}`,
+                            clientEmail: invoice.client.email,
+                            items: invoice.items.map((item: any) => ({
+                                description: item.description,
+                                quantity: item.quantity,
+                                unitPrice: item.unitPrice,
+                                vatRate: item.vatRate
+                            })),
+                            subTotal: invoice.subTotal,
+                            vatAmount: invoice.taxAmount,
+                            total: invoice.total
+                        }}
+                    />
+                ) : (
+                    <div className="p-8 text-center text-gray-500">Chargement du modèle...</div>
+                )}
             </div>
         </div>
     )

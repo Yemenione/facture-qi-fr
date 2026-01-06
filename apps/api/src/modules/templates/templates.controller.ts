@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateTemplateDto } from './dto/create-template.dto';
 
 @Controller('templates')
 @UseGuards(JwtAuthGuard)
@@ -18,12 +19,12 @@ export class TemplatesController {
     }
 
     @Post()
-    async create(@Body() createDto: any, @Request() req) {
+    async create(@Body() createDto: CreateTemplateDto, @Request() req) {
         return this.templatesService.create(createDto, req.user.companyId);
     }
 
     @Put(':id')
-    async update(@Param('id') id: string, @Body() updateDto: any, @Request() req) {
+    async update(@Param('id') id: string, @Body() updateDto: CreateTemplateDto, @Request() req) {
         return this.templatesService.update(id, updateDto, req.user.companyId);
     }
 

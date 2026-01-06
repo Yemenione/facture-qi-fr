@@ -16,14 +16,21 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 
+import { useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+
 export default function RegisterPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const planCode = searchParams.get('plan') || 'FREE';
+
     const [formData, setFormData] = useState({
         companyName: '',
         firstName: '',
         lastName: '',
         email: '',
-        password: ''
+        password: '',
+        planCode: planCode.toUpperCase()
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,185 +1,127 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Plus, Palette, Trash2, Star, Edit } from "lucide-react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { Plus, Check, Trash2, Pencil, Palette, Star } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import templateService, { InvoiceTemplate } from "@/services/template.service"
 
 export default function TemplatesPage() {
-    const [templates, setTemplates] = useState<any[]>([])
+    const [templates, setTemplates] = useState<InvoiceTemplate[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetchTemplates()
+        loadTemplates()
     }, [])
 
-    const fetchTemplates = async () => {
+    const loadTemplates = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/templates`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            const data = await response.json()
+            const data = await templateService.findAll()
             setTemplates(data)
         } catch (error) {
-            console.error('Failed to load templates', error)
+            console.error("Failed to load templates", error)
         } finally {
             setLoading(false)
         }
     }
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce template ?')) return
-
+    const setAsDefault = async (id: string) => {
         try {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/templates/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            fetchTemplates()
+            await templateService.setDefault(id)
+            // Refresh local state to show new default
+            loadTemplates()
         } catch (error) {
-            console.error('Failed to delete template', error)
+            console.error(error)
+            alert("Erreur lors de la mise à jour")
         }
     }
 
-    const handleSetDefault = async (id: string) => {
+    const deleteTemplate = async (id: string) => {
+        if (!confirm("Voulez-vous vraiment supprimer ce modèle ?")) return;
         try {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/templates/${id}/set-default`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            fetchTemplates()
+            await templateService.delete(id)
+            loadTemplates()
         } catch (error) {
-            console.error('Failed to set default', error)
+            console.error(error)
+            alert("Impossible de supprimer ce modèle (peut-être est-il le seul ?)")
         }
-    }
-
-    const getTypeLabel = (type: string) => {
-        const labels: any = {
-            CLASSIC: 'Classique',
-            MODERN: 'Moderne',
-            ELEGANT: 'Élégant',
-            COLORFUL: 'Coloré'
-        }
-        return labels[type] || type
     }
 
     if (loading) return <div className="p-8">Chargement...</div>
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 max-w-6xl mx-auto pb-20 p-2">
+            <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Templates de factures</h1>
-                    <p className="text-muted-foreground">Personnalisez l'apparence de vos factures</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Modèles de Facture</h1>
+                    <p className="text-slate-500">Personnalisez l'apparence de vos documents.</p>
                 </div>
-                <Link href="/dashboard/settings/templates/new">
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Nouveau template
-                    </Button>
-                </Link>
+                <Button asChild>
+                    <Link href="/dashboard/settings/templates/new">
+                        <Plus className="mr-2 h-4 w-4" /> Nouveau Modèle
+                    </Link>
+                </Button>
             </div>
 
-            {templates.length === 0 ? (
-                <Card>
-                    <CardContent className="flex flex-col items-center justify-center py-12">
-                        <Palette className="h-12 w-12 text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Aucun template</h3>
-                        <p className="text-muted-foreground text-center mb-4">
-                            Créez votre premier template personnalisé
-                        </p>
-                        <Link href="/dashboard/settings/templates/new">
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Créer un template
-                            </Button>
-                        </Link>
-                    </CardContent>
-                </Card>
-            ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {templates.map((template) => (
-                        <Card key={template.id} className="relative group hover:shadow-lg transition-shadow">
-                            {template.isDefault && (
-                                <div className="absolute top-4 right-4 z-10">
-                                    <div className="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                                        <Star className="h-3 w-3 fill-current" />
-                                        Par défaut
-                                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {templates.map((template) => (
+                    <Card key={template.id} className={`group relative overflow-hidden transition-all ${template.isDefault ? 'ring-2 ring-blue-500 shadow-md' : 'hover:shadow-md'}`}>
+                        {template.isDefault && (
+                            <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-bl-lg flex items-center">
+                                <Star className="w-3 h-3 mr-1 fill-white" /> Par défaut
+                            </div>
+                        )}
+
+                        <div className="h-32 bg-slate-50 border-b flex items-center justify-center p-4">
+                            {/* Mini Preview Placeholder */}
+                            <div className="w-full h-full bg-white shadow-sm border p-2 flex flex-col gap-2 scale-90 opacity-75">
+                                <div className="h-2 w-1/3 rounded" style={{ backgroundColor: template.primaryColor }}></div>
+                                <div className="space-y-1">
+                                    <div className="h-1 w-full bg-slate-100 rounded"></div>
+                                    <div className="h-1 w-2/3 bg-slate-100 rounded"></div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-lg flex items-center justify-between">
+                                {template.name}
+                            </CardTitle>
+                            <CardDescription className="capitalize text-xs">
+                                Style: {template.type.toLowerCase()}
+                            </CardDescription>
+                        </CardHeader>
+
+                        <CardContent className="pb-2">
+                            <div className="flex gap-2">
+                                <div className="w-6 h-6 rounded-full border shadow-sm" style={{ backgroundColor: template.primaryColor }} title="Couleur Principale"></div>
+                                <div className="w-6 h-6 rounded-full border shadow-sm" style={{ backgroundColor: template.secondaryColor }} title="Couleur Secondaire"></div>
+                            </div>
+                        </CardContent>
+
+                        <CardFooter className="flex justify-end gap-2 pt-2">
+                            {!template.isDefault && (
+                                <Button variant="outline" size="sm" onClick={() => setAsDefault(template.id)} className="text-xs">
+                                    <Check className="h-3 w-3 mr-1" /> Définir par défaut
+                                </Button>
                             )}
-
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <div
-                                        className="w-4 h-4 rounded-full border-2"
-                                        style={{ backgroundColor: template.primaryColor }}
-                                    />
-                                    {template.name}
-                                </CardTitle>
-                                <CardDescription>{getTypeLabel(template.type)}</CardDescription>
-                            </CardHeader>
-
-                            <CardContent>
-                                <div className="space-y-4">
-                                    {/* Color Preview */}
-                                    <div className="flex gap-2">
-                                        <div
-                                            className="w-8 h-8 rounded border"
-                                            style={{ backgroundColor: template.primaryColor }}
-                                            title="Couleur primaire"
-                                        />
-                                        <div
-                                            className="w-8 h-8 rounded border"
-                                            style={{ backgroundColor: template.secondaryColor }}
-                                            title="Couleur secondaire"
-                                        />
-                                        <div
-                                            className="w-8 h-8 rounded border"
-                                            style={{ backgroundColor: template.textColor }}
-                                            title="Couleur du texte"
-                                        />
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="flex gap-2">
-                                        <Link href={`/dashboard/settings/templates/${template.id}/edit`} className="flex-1">
-                                            <Button variant="outline" size="sm" className="w-full">
-                                                <Edit className="mr-2 h-3 w-3" />
-                                                Modifier
-                                            </Button>
-                                        </Link>
-                                        {!template.isDefault && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleSetDefault(template.id)}
-                                            >
-                                                <Star className="h-3 w-3" />
-                                            </Button>
-                                        )}
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleDelete(template.id)}
-                                            disabled={template.isDefault}
-                                        >
-                                            <Trash2 className="h-3 w-3" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            )}
+                            <Button variant="ghost" size="sm" asChild>
+                                <Link href={`/dashboard/settings/templates/${template.id}`}>
+                                    <Pencil className="h-4 w-4 text-slate-400 hover:text-blue-600" />
+                                </Link>
+                            </Button>
+                            {!template.isDefault && (
+                                <Button variant="ghost" size="sm" onClick={() => deleteTemplate(template.id)}>
+                                    <Trash2 className="h-4 w-4 text-slate-400 hover:text-red-600" />
+                                </Button>
+                            )}
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
         </div>
     )
 }

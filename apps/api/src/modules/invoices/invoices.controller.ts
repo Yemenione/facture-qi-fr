@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, UseGuards, Request, Res, NotFoundException, BadRequestException, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, UseGuards, Request, Res, NotFoundException, BadRequestException, Patch, Delete, Query } from '@nestjs/common';
 import { InvoicesService } from './invoices.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -6,6 +6,7 @@ import { CompanyScopeGuard } from '../auth/guards/company-scope.guard';
 import { Response } from 'express';
 import { PdfService } from '../pdf/pdf.service';
 import { MailService } from '../mail/mail.service';
+import { TemplatesService } from '../templates/templates.service';
 
 @Controller('invoices')
 @UseGuards(JwtAuthGuard, CompanyScopeGuard)
@@ -13,7 +14,8 @@ export class InvoicesController {
     constructor(
         private readonly invoicesService: InvoicesService,
         private readonly pdfService: PdfService,
-        private readonly mailService: MailService
+        private readonly mailService: MailService,
+        private readonly templatesService: TemplatesService
     ) { }
 
     @Post()
@@ -30,8 +32,8 @@ export class InvoicesController {
     }
 
     @Get()
-    findAll(@Request() req) {
-        return this.invoicesService.findAll(req.user.companyId);
+    findAll(@Request() req, @Query('type') type?: 'INVOICE' | 'QUOTE' | 'CREDIT_NOTE') {
+        return this.invoicesService.findAll(req.user.companyId, type);
     }
 
     @Get(':id')
@@ -49,6 +51,16 @@ export class InvoicesController {
         return this.invoicesService.updateStatus(req.user.companyId, id, status);
     }
 
+    @Post(':id/convert')
+    convertToInvoice(@Request() req, @Param('id') id: string) {
+        return this.invoicesService.convertToInvoice(req.user.companyId, id);
+    }
+
+    @Post(':id/credit-note')
+    createCreditNote(@Request() req, @Param('id') id: string) {
+        return this.invoicesService.createCreditNote(req.user.companyId, id);
+    }
+
     @Get(':id/pdf')
     async downloadPdf(@Request() req, @Param('id') id: string, @Res() res: Response) {
         const invoice = await this.invoicesService.findOne(req.user.companyId, id);
@@ -56,7 +68,8 @@ export class InvoicesController {
             throw new NotFoundException('Invoice not found');
         }
 
-        const buffer = await this.pdfService.generateInvoice(invoice);
+        const template = await this.templatesService.getDefault(req.user.companyId);
+        const buffer = await this.pdfService.generateInvoice(invoice, template);
 
         res.set({
             'Content-Type': 'application/pdf',
@@ -74,7 +87,8 @@ export class InvoicesController {
         if (!invoice.client || !invoice.client.email) throw new BadRequestException('Client has no email');
 
         // Generate PDF
-        const buffer = await this.pdfService.generateInvoice(invoice);
+        const template = await this.templatesService.getDefault(req.user.companyId);
+        const buffer = await this.pdfService.generateInvoice(invoice, template);
 
         // Convert Uint8Array to Buffer
         const pdfBuffer = Buffer.from(buffer);

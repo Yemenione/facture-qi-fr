@@ -1,4 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { CommandPalette } from "../components/CommandPalette";
 
 export const RequireSuperAdmin = () => {
     const token = localStorage.getItem("admin_token");
@@ -7,5 +8,10 @@ export const RequireSuperAdmin = () => {
         return <Navigate to="/login" replace />;
     }
 
-    return <Outlet />;
+    return (
+        <>
+            <CommandPalette />
+            <Outlet />
+        </>
+    );
 };

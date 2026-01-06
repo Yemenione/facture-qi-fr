@@ -21,8 +21,15 @@ export class AuthService {
 
         // 3. Create Company & Admin User Transaction
         const result = await this.prisma.$transaction(async (tx) => {
-            // Find default plan (or create a dummy one if empty DB)
-            let plan = await tx.subscriptionPlan.findFirst({ where: { code: 'FREE' } });
+            // Find requested plan or default to FREE
+            const planCode = dto.planCode || 'FREE';
+            let plan = await tx.subscriptionPlan.findFirst({ where: { code: planCode } });
+
+            // Fallback if specific plan not found (e.g. invalid code)
+            if (!plan) {
+                plan = await tx.subscriptionPlan.findFirst({ where: { code: 'FREE' } });
+            }
+
             if (!plan) {
                 plan = await tx.subscriptionPlan.create({
                     data: { code: 'FREE', name: 'Freemium', priceMonthly: 0, maxInvoices: 10, maxUsers: 1, features: {} }

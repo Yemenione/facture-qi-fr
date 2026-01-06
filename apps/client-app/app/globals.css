@@ -80,11 +80,38 @@
     font-variant-numeric: lining-nums;
   }
 
-  input[type="number"],
-  input[type="text"],
-  input[inputmode="decimal"],
   input[inputmode="numeric"] {
     font-variant-numeric: lining-nums;
     direction: ltr;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide non-printable elements */
+  .no-print,
+  header,
+  nav,
+  aside {
+    display: none !important;
+  }
+
+  /* Ensure invoice container fits */
+  #invoice-preview {
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
   }
 }

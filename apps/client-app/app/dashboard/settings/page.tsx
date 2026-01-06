@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import companyService from "@/services/company.service"
 import { useAuthStore } from "@/store/auth-store"
+import { useToast } from "@/providers/toast-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,6 +18,8 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [company, setCompany] = useState<any>({})
+
+    const toast = useToast()
 
     useEffect(() => {
         loadData()
@@ -32,7 +36,7 @@ export default function SettingsPage() {
             setLoading(false)
         }
     }
-
+    // ...
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setSaving(true)
@@ -42,10 +46,10 @@ export default function SettingsPage() {
                 address: company.address
             }
             await companyService.update(payload)
-            alert("Paramètres mis à jour avec succès ✅")
+            toast.success("Paramètres mis à jour", "Vos informations ont été enregistrées avec succès.")
         } catch (error: any) {
             console.error("Update Error:", error)
-            alert("Erreur lors de la mise à jour")
+            toast.error("Erreur de mise à jour", "Veuillez vérifier vos informations.")
         } finally {
             setSaving(false)
         }
@@ -64,7 +68,7 @@ export default function SettingsPage() {
 
     const handleSiretSearch = async () => {
         if (!company.siret || company.siret.length < 9) {
-            alert("Numéro SIREN/SIRET invalide")
+            toast.warning("Numéro Invalide", "Veuillez saisir un numéro SIREN/SIRET valide.")
             return
         }
         try {
@@ -84,11 +88,11 @@ export default function SettingsPage() {
                         country: "France"
                     }
                 }))
-                alert("Informations trouvées et remplies ! ✅")
+                toast.success("Entreprise trouvée", "Les informations ont été pré-remplies.")
             }
         } catch (error) {
             console.error(error)
-            alert("Entreprise non trouvée")
+            toast.error("Entreprise introuvable", "Impossible de récupérer les informations pour ce SIRET.")
         }
     }
 
@@ -237,11 +241,65 @@ export default function SettingsPage() {
                                 <CardTitle>Personnalisation</CardTitle>
                                 <CardDescription>Ajoutez votre logo et définissez vos couleurs.</CardDescription>
                             </CardHeader>
-                            <CardContent>
-                                <div className="flex items-center justify-center p-8 border-2 border-dashed border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                            <CardContent className="space-y-6">
+                                <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-2 bg-white rounded-full border shadow-sm">
+                                            <Palette className="w-6 h-6 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold text-slate-900">Modèles de Facture</h3>
+                                            <p className="text-sm text-slate-500">Personnalisez le design de vos documents (couleurs, polices, mise en page).</p>
+                                        </div>
+                                    </div>
+                                    <Button variant="outline" asChild>
+                                        <Link href="/dashboard/settings/templates">
+                                            Gérer les modèles
+                                        </Link>
+                                    </Button>
+                                </div>
+
+                                <div
+                                    className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-200 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer relative"
+                                    onClick={() => document.getElementById('logo-upload')?.click()}
+                                >
+                                    {company.logoUrl ? (
+                                        <div className="relative w-40 h-40 mb-4">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={`${process.env.NEXT_PUBLIC_API_URL}${company.logoUrl}`}
+                                                alt="Company Logo"
+                                                className="w-full h-full object-contain"
+                                            />
+                                            <div className="absolute inset-0 bg-black/10 hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center opacity-0 hover:opacity-100">
+                                                <span className="text-white text-xs font-medium">Changer</span>
+                                            </div>
+                                        </div>
+                                    ) : null}
+
+                                    <input
+                                        type="file"
+                                        id="logo-upload"
+                                        className="hidden"
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                try {
+                                                    const url = await companyService.uploadLogo(file);
+                                                    setCompany((prev: any) => ({ ...prev, logoUrl: url }));
+                                                    toast.success("Logo mis à jour", "Votre logo a été téléchargé avec succès.");
+                                                } catch (error) {
+                                                    console.error(error);
+                                                    toast.error("Erreur", "Impossible de télécharger le logo.");
+                                                }
+                                            }
+                                        }}
+                                    />
+
                                     <div className="text-center">
                                         <div className="mt-2 text-sm text-slate-600">
-                                            <span className="font-semibold text-blue-600">Cliquez pour uploader</span> ou glissez-déposez
+                                            <span className="font-semibold text-blue-600">Cliquez pour uploader (Logo)</span> ou glissez-déposez
                                         </div>
                                         <p className="text-xs text-slate-500">Mettez votre logo ici (PNG, JPG)</p>
                                     </div>

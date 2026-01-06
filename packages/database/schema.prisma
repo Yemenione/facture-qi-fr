@@ -21,6 +21,18 @@ model SuperAdmin {
   createdAt DateTime @default(now())
 }
 
+model MarketingCampaign {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject   String
+  content   String
+  segment   String   // 'ALL', 'ACTIVE', 'INACTIVE', 'PRO_PLAN'
+  status    String   // 'DRAFT', 'SENT', 'SCHEDULED'
+  sentAt    DateTime?
+  sentCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model SubscriptionPlan {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
   code           String    @unique // ex: 'FREE', 'PRO', 'AGENCY'
@@ -30,6 +42,16 @@ model SubscriptionPlan {
   maxUsers       Int       // -1 for unlimited
   features       Json      // Feature flags like { "api_access": true, "custom_branding": false }
   companies      Company[]
+}
+
+// --------------------------------------
+// ENUMS
+// --------------------------------------
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }
 
 // --------------------------------------
@@ -53,10 +75,15 @@ model Company {
   plan            SubscriptionPlan @relation(fields: [planId], references: [id])
   subscriptionStatus String // 'ACTIVE', 'PAST_DUE', 'CANCELLED'
   stripeCustomerId   String?
+  features           Json?    // Custom feature overrides { "api_access": true }
 
   // Settings
   legalMentions   String?  // Mention légale par défaut bas de page
   facturXProfile  String   @default("BASIC") // BASIC, EN_16931, EXTENDED
+  
+  // KYC / Verification
+  verificationStatus VerificationStatus @default(PENDING)
+  verificationDocuments Json? // [{ type: 'KBIS', url: '...' }, { type: 'ID', url: '...' }]
   
   // Mandatory Legal Mentions 2026
   capital         String?  // Capital social (ex: "1000")
@@ -74,27 +101,54 @@ model Company {
   creationDate    DateTime? // Date de création
   category        String?  // PME, ETI...
   
+  // External Accountant
+  accountantFirmId String? @db.ObjectId
+  accountantFirm   AccountantFirm? @relation(fields: [accountantFirmId], references: [id])
+  
   // Relations
   users           User[]
   clients         Client[]
   invoices        Invoice[]
   products        Product[]
   templates       InvoiceTemplate[]
+  apiKeys         ApiKey[]
   settings        CompanySettings?
+  expenses        Expense[]
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
 
 // --------------------------------------
-// USERS (WITHIN COMPANIES)
+// ACCOUNTANT FIRM (CABINET D'EXPERTISE)
+// --------------------------------------
+
+model AccountantFirm {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String   @unique
+  phone       String?
+  address     Json?
+  logoUrl     String?
+  
+  users       User[]   // Accountants working in this firm
+  companies   Company[] // Client companies managed by this firm
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// --------------------------------------
+// USERS (WITHIN COMPANIES OR FIRMS)
 // --------------------------------------
 
 enum UserRole {
   OWNER
   ADMIN
-  ACCOUNTANT // Read-only + Exports
-  SALES      // Can create drafts only
+  ACCOUNTANT // Internal Accountant (CFO)
+  SALES
+  FIRM_ADMIN // External Accountant Admin
+  FIRM_USER  // External Accountant Collaborator
 }
 
 model User {
@@ -105,8 +159,58 @@ model User {
   lastName    String
   role        UserRole @default(ADMIN)
   
-  companyId   String   @db.ObjectId
-  company     Company  @relation(fields: [companyId], references: [id])
+  // A user belongs EITHER to a Company OR an AccountantFirm
+  companyId   String?  @db.ObjectId
+  company     Company? @relation(fields: [companyId], references: [id])
+  
+  accountantFirmId String? @db.ObjectId
+  accountantFirm   AccountantFirm? @relation(fields: [accountantFirmId], references: [id])
+  
+  tickets     Ticket[] // Support tickets
+
+  createdAt   DateTime @default(now())
+}
+
+// --------------------------------------
+// SUPPORT SYSTEM
+// --------------------------------------
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Ticket {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject     String
+  status      TicketStatus @default(OPEN)
+  priority    TicketPriority @default(MEDIUM)
+  
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  
+  messages    TicketMessage[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TicketMessage {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  content     String
+  isAdmin     Boolean  @default(false) // True if sent by admin
+  
+  ticketId    String   @db.ObjectId
+  ticket      Ticket   @relation(fields: [ticketId], references: [id])
   
   createdAt   DateTime @default(now())
 }
@@ -187,6 +291,10 @@ model Invoice {
   pdfUrl          String?
   securityHash    String?
   previousHash    String?
+
+  // Dunning
+  reminderLevel   Int            @default(0)
+  lastReminderDate DateTime?
   
   // Financials
   subTotal        Float
@@ -333,7 +441,94 @@ model CompanySettings {
   companyId   String   @unique @db.ObjectId
   company     Company  @relation(fields: [companyId], references: [id])
   
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
+// --------------------------------------
+// SYSTEM BROADCASTS
+// --------------------------------------
+
+enum BroadcastType {
+  INFO
+  WARNING
+  CRITICAL
+  SUCCESS
+}
+
+model Broadcast {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  message     String
+  type        BroadcastType @default(INFO)
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime?
+  
+  createdBy   String?
+  
+  createdAt   DateTime @default(now())
+}
+
+// --------------------------------------
+// SYSTEM AUDIT & SECURITY
+// --------------------------------------
+
+model AuditLog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  action      String   // e.g. "UPDATE_COMPANY_PLAN"
+  actorId     String   // Admin ID
+  targetId    String?  // Company/User ID
+  metadata    Json?    // { oldPlan: 'FREE', newPlan: 'PRO' }
+  ipAddress   String?
+  
+  createdAt   DateTime @default(now())
+}
+
+model ApiKey {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   // "Make Integration", "Zapier", etc.
+  prefix      String   // "sk_live_..." (first few chars for display)
+  keyHash     String
+  
+  lastUsedAt  DateTime?
+  
+  companyId   String   @db.ObjectId
+  company     Company  @relation(fields: [companyId], references: [id])
+  
+  createdAt   DateTime @default(now())
+}
+
+// --------------------------------------
+// EXPENSE MANAGEMENT
+// --------------------------------------
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  PAID
+  REJECTED
+}
+
+model Expense {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  description String
+  amount      Float
+  currency    String   @default("EUR")
+  date        DateTime
+  supplier    String
+  category    String?  // e.g. "Travel", "Software"
+  
+  vatAmount   Float?
+  proofUrl    String?  // URL to receipt image/pdf
+  
+  status      ExpenseStatus @default(PENDING)
+  
+  companyId   String   @db.ObjectId
+  company     Company  @relation(fields: [companyId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([companyId])
+}

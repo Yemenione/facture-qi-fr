@@ -101,7 +101,7 @@ export function InvoiceForm({ initialData, invoiceId }: InvoiceFormProps) {
     const discount = useWatch({ control: form.control, name: "discount" }) || 0
     const discountType = useWatch({ control: form.control, name: "discountType" })
 
-    const totals = items.reduce((acc, item) => {
+    const totals = (items || []).reduce((acc, item) => {
         const qty = Number(item.quantity) || 0
         const price = Number(item.unitPrice) || 0
         const vat = Number(item.vatRate) || 0

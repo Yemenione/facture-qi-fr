@@ -9,11 +9,27 @@ export class CompaniesService {
     async findOne(id: string) {
         const company = await this.prisma.company.findUnique({
             where: { id },
+            include: { plan: true }
         });
         if (!company) {
             throw new NotFoundException(`Company with ID ${id} not found`);
         }
         return company;
+    }
+
+    async findAll() {
+        return this.prisma.company.findMany({
+            include: { plan: true },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
+
+    async findByFirm(firmId: string) {
+        return this.prisma.company.findMany({
+            where: { accountantFirmId: firmId },
+            include: { plan: true },
+            orderBy: { createdAt: 'desc' }
+        });
     }
 
     async update(id: string, updateCompanyDto: UpdateCompanyDto) {
@@ -45,6 +61,13 @@ export class CompaniesService {
                 creationDate: updateCompanyDto.creationDate ? new Date(updateCompanyDto.creationDate) : undefined,
                 category: updateCompanyDto.category,
             },
+        });
+    }
+
+    async updateLogo(id: string, logoUrl: string) {
+        return this.prisma.company.update({
+            where: { id },
+            data: { logoUrl },
         });
     }
 

@@ -2,30 +2,69 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Plus, Search, MoreHorizontal, Download, Mail, Eye, FileText, FileClock, FileWarning, Pencil, Trash2 } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Download, Mail, Eye, FileText, FileClock, FileWarning, Pencil, Trash2, FileSpreadsheet } from "lucide-react"
+import { getCookie } from "cookies-next"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import invoiceService from "@/services/invoice.service"
 import { formatCurrency } from "@/lib/utils"
+import { useToast } from "@/providers/toast-provider"
 
 export default function InvoicesPage() {
     const [invoices, setInvoices] = useState<any[]>([])
+    const [filteredInvoices, setFilteredInvoices] = useState<any[]>([])
+    const [searchQuery, setSearchQuery] = useState("")
     const [loading, setLoading] = useState(true)
+    const toast = useToast()
 
     useEffect(() => {
         loadInvoices()
     }, [])
 
+    useEffect(() => {
+        if (!searchQuery) {
+            setFilteredInvoices(invoices)
+        } else {
+            const lower = searchQuery.toLowerCase()
+            setFilteredInvoices(invoices.filter(inv =>
+                inv.invoiceNumber?.toLowerCase().includes(lower) ||
+                inv.client?.name?.toLowerCase().includes(lower)
+            ))
+        }
+    }, [searchQuery, invoices])
+
     const loadInvoices = async () => {
         try {
             const data = await invoiceService.findAll()
             setInvoices(data)
+            setFilteredInvoices(data)
         } catch (error) {
             console.error("Failed to load invoices", error)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleBulkExport = async (format: 'xlsx' | 'csv') => {
+        try {
+            const token = getCookie('token');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/data-ops/export/invoices?format=${format}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Export failed');
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoices-export-${new Date().toISOString().split('T')[0]}.${format}`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            toast.success("Export Successful", `Downloaded ${format.toUpperCase()} file.`);
+        } catch (error) {
+            toast.error("Export Failed", "Could not export data.");
         }
     }
 
@@ -89,11 +128,19 @@ export default function InvoicesPage() {
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Documents</h1>
                     <p className="text-slate-500 mt-1">Factures, Devis et Avoirs centralisés.</p>
                 </div>
-                <Button asChild className="bg-slate-900 shadow-lg hover:bg-slate-800 rounded-full">
-                    <Link href="/dashboard/invoices/new">
-                        <Plus className="mr-2 h-4 w-4" /> Créer un document
-                    </Link>
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => handleBulkExport('xlsx')} className="text-green-700 bg-green-50 border-green-200 hover:bg-green-100">
+                        <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel
+                    </Button>
+                    <Button variant="outline" onClick={() => handleBulkExport('csv')} className="text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100">
+                        <FileText className="mr-2 h-4 w-4" /> CSV
+                    </Button>
+                    <Button asChild className="bg-slate-900 shadow-lg hover:bg-slate-800 rounded-full">
+                        <Link href="/dashboard/invoices/new">
+                            <Plus className="mr-2 h-4 w-4" /> Créer un document
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             {/* Stats Overview */}
@@ -140,6 +187,8 @@ export default function InvoicesPage() {
                     <Input
                         placeholder="Rechercher par numéro ou client..."
                         className="pl-10 max-w-sm rounded-full bg-white border-slate-200 focus:ring-slate-900"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
@@ -163,7 +212,7 @@ export default function InvoicesPage() {
                                     </td>
                                 </tr>
                             ) : (
-                                invoices.map((invoice) => (
+                                filteredInvoices.map((invoice) => (
                                     <tr key={invoice.id} className="hover:bg-slate-50 transition-colors group">
                                         <td className="p-4 align-middle">
                                             <div className="flex items-center gap-3">
