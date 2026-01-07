@@ -176,6 +176,14 @@ export default function TemplateEditor({ initialData, isEditing = false }: Templ
                             className="text-lg font-bold border-none px-0 shadow-none focus-visible:ring-0 placeholder:text-gray-400"
                             placeholder="Nom du modèle..."
                         />
+                        <div className="flex items-center space-x-2 mr-4">
+                            <Switch
+                                id="isDefault"
+                                checked={watch("isDefault")}
+                                onCheckedChange={(val) => setValue("isDefault", val)}
+                            />
+                            <Label htmlFor="isDefault" className="text-sm font-medium">Définir par défaut</Label>
+                        </div>
                         <Button onClick={handleSubmit(onSubmit)} disabled={saving}>
                             {saving && <Loader2 className="animate-spin h-4 w-4 mr-2" />}
                             <Save className="h-4 w-4 mr-2" />

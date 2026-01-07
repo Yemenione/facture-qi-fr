@@ -45,6 +45,38 @@ export default function ImportExportPage() {
         }
     }
 
+    const handleDownloadFEC = async () => {
+        try {
+            const token = getCookie('token');
+            const year = new Date().getFullYear();
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounting/fec?year=${year}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (!res.ok) throw new Error("FEC Generation failed");
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            // Get filename from header or default
+            const contentDisposition = res.headers.get('Content-Disposition');
+            let filename = `export-fec-${year}.txt`;
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename="?([^"]+)"?/);
+                if (match && match[1]) filename = match[1];
+            }
+
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            toast.success("Succès", "Fichier FEC généré avec succès.");
+        } catch (error) {
+            console.error(error);
+            toast.error("Erreur", "Impossible de générer le fichier FEC.");
+        }
+    }
+
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -117,6 +149,19 @@ export default function ImportExportPage() {
                                 </div>
                             </div>
                             <button onClick={() => handleDownload('clients', 'csv')} className="text-sm font-semibold text-indigo-600 hover:underline">Download</button>
+                        </div>
+
+                        <div className="flex justify-between items-center p-3 border border-indigo-50 bg-indigo-50/30 rounded-lg hover:bg-indigo-50 transition border-l-4 border-l-indigo-500">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-indigo-100 text-indigo-700 rounded-lg"><FileSpreadsheet className="w-5 h-5" /></div>
+                                <div>
+                                    <div className="font-medium text-indigo-900">Export Comptable (FEC)</div>
+                                    <div className="text-xs text-indigo-500">Format légal français (.txt)</div>
+                                </div>
+                            </div>
+                            <button onClick={handleDownloadFEC} className="text-sm font-semibold text-indigo-600 hover:underline">
+                                Générer
+                            </button>
                         </div>
                     </div>
                 </div>

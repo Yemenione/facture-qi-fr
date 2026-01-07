@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, Patch, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
-import { UpdateExpenseDto } from './dto/update-expense.dto'; // Added this import
+
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';

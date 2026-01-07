@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
 import { InvoicesService } from './invoices.service';
 import { InvoicesController } from './invoices.controller';
-import { FacturXGeneratorService } from './facturx-generator.service';
+
 import { PrismaService } from '../../prisma/prisma.service';
 import { PdfModule } from '../pdf/pdf.module';
 import { MailModule } from '../mail/mail.module';
 import { TemplatesModule } from '../templates/templates.module';
 
+import { DataOpsModule } from '../data-ops/data-ops.module';
+
 @Module({
-    imports: [PdfModule, MailModule, TemplatesModule],
+    imports: [PdfModule, MailModule, TemplatesModule, DataOpsModule],
     controllers: [InvoicesController],
-    providers: [InvoicesService, FacturXGeneratorService, PrismaService],
+    providers: [InvoicesService, PrismaService],
 })
 export class InvoicesModule { }

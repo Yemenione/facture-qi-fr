@@ -130,7 +130,7 @@ export class ReconciliationService {
                 where: { id: transactionId },
                 data: {
                     status: 'RECONCILED',
-                    expenseId
+                    linkedExpenseId: expenseId
                 }
             }),
             this.prisma.expense.update({

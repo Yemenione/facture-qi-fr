@@ -167,12 +167,21 @@ export default function InvoiceDetailsPage() {
                         template={template}
                         data={{
                             invoiceNumber: invoice.invoiceNumber,
-                            issueDate: new Date(invoice.createdAt).toLocaleDateString(),
-                            dueDate: invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'Non spécifiée',
+                            issueDate: invoice.issueDate || invoice.createdAt, // Pass raw ISO string/Date
+                            dueDate: invoice.dueDate || null, // Pass raw ISO string/Date or null
                             companyName: invoice.company.name,
                             companyAddress: `${(invoice.company.address as any)?.street || ''}, ${(invoice.company.address as any)?.zip || ''} ${(invoice.company.address as any)?.city || ''}`,
                             companyEmail: invoice.company.email,
                             companyPhone: invoice.company.phone,
+                            // Pass comprehensive legal info from Company Profile
+                            companySiret: invoice.company.siret,
+                            companyRcs: invoice.company.rcs,
+                            companyVat: invoice.company.vatNumber,
+                            companyCapital: invoice.company.capital,
+                            companyIban: invoice.company.iban,
+                            companyBic: invoice.company.bic,
+                            companyLegalForm: invoice.company.legalForm,
+
                             clientName: invoice.client.name,
                             clientAddress: `${(invoice.client.address as any)?.street || ''}, ${(invoice.client.address as any)?.zip || ''} ${(invoice.client.address as any)?.city || ''}`,
                             clientEmail: invoice.client.email,

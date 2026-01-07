@@ -7,5 +7,6 @@ import { PrismaModule } from '../../prisma/prisma.module';
     imports: [PrismaModule],
     providers: [DataOpsService],
     controllers: [DataOpsController],
+    exports: [DataOpsService]
 })
 export class DataOpsModule { }

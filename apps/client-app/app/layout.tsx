@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '@/providers/toast-provider'
 
+import { CookieConsent } from '@/components/cookie-consent'
+
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
@@ -20,6 +22,7 @@ export default function RootLayout({
             <body className={inter.className} style={{ fontVariantNumeric: 'lining-nums' }}>
                 <ToastProvider>
                     {children}
+                    <CookieConsent />
                 </ToastProvider>
             </body>
         </html>

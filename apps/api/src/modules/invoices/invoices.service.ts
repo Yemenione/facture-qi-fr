@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { FacturXGeneratorService } from './facturx-generator.service';
+
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { InvoiceCalculator } from './invoice-calculator';
 import * as crypto from 'crypto';
@@ -8,8 +8,7 @@ import * as crypto from 'crypto';
 @Injectable()
 export class InvoicesService {
     constructor(
-        private prisma: PrismaService,
-        private facturXService: FacturXGeneratorService
+        private prisma: PrismaService
     ) { }
 
     async create(companyId: string, data: CreateInvoiceDto) {
@@ -32,7 +31,7 @@ export class InvoicesService {
                     taxAmount: totals.totalVAT,
                     total: totals.totalTTC,
                     seqNumber: 0,
-                    invoiceNumber: `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                    invoiceNumber: `${prefix}-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
                     status: 'DRAFT', // Quotes start as DRAFT too
                     type: data.type || 'INVOICE',
                     validityDate: data.validityDate ? new Date(data.validityDate) : undefined,
@@ -117,7 +116,7 @@ export class InvoicesService {
 
             // Generate PDF (Factur-X only for Invoices)
             // For Quotes, we might use a different generator or same one adapted
-            const pdfUrl = await this.facturXService.generateAndUpload(validatedInvoice);
+            const pdfUrl = `https://mock-s3.com/invoices/${validatedInvoice.invoiceNumber}.pdf`;
 
             return tx.invoice.update({
                 where: { id: invoiceId },

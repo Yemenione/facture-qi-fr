@@ -42,10 +42,10 @@ export function Footer() {
                     <div>
                         <h3 className="font-semibold text-white mb-4">Légal</h3>
                         <ul className="space-y-3 text-sm">
-                            <li><Link href="#" className="hover:text-indigo-400 transition-colors">Mentions légales</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-400 transition-colors">CGU / CGV</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-400 transition-colors">Confidentialité</Link></li>
-                            <li><Link href="#" className="hover:text-indigo-400 transition-colors">RGPD</Link></li>
+                            <li><Link href="/legal/mentions" className="hover:text-indigo-400 transition-colors">Mentions légales</Link></li>
+                            <li><Link href="/legal/cgu" className="hover:text-indigo-400 transition-colors">CGU / CGV</Link></li>
+                            <li><Link href="/legal/privacy" className="hover:text-indigo-400 transition-colors">Confidentialité</Link></li>
+                            <li><Link href="/legal/privacy" className="hover:text-indigo-400 transition-colors">RGPD</Link></li>
                         </ul>
                     </div>
                 </div>

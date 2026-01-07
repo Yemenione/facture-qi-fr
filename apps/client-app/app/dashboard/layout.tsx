@@ -9,7 +9,7 @@ export default function DashboardLayout({
 }) {
     return (
         <AuthGuard>
-            <div className="hidden md:block">
+            <div className="hidden md:block print:block">
                 <ExpertModeBanner />
                 <div className="border-b">
                     <div className="flex h-16 items-center px-4">

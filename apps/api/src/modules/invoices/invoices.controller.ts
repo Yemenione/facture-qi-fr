@@ -8,7 +8,9 @@ import { PdfService } from '../pdf/pdf.service';
 import { MailService } from '../mail/mail.service';
 import { TemplatesService } from '../templates/templates.service';
 
-import { FacturXGeneratorService } from './facturx-generator.service';
+import { FacturXXmlService } from '../pdf/factur-x-xml.service';
+
+import { DataOpsService } from '../data-ops/data-ops.service';
 
 @Controller('invoices')
 @UseGuards(JwtAuthGuard, CompanyScopeGuard)
@@ -18,7 +20,8 @@ export class InvoicesController {
         private readonly pdfService: PdfService,
         private readonly mailService: MailService,
         private readonly templatesService: TemplatesService,
-        private readonly facturXService: FacturXGeneratorService
+        private readonly facturXService: FacturXXmlService,
+        private readonly dataOpsService: DataOpsService
     ) { }
 
     @Post()
@@ -65,23 +68,41 @@ export class InvoicesController {
     }
 
     @Get(':id/pdf')
-    async downloadPdf(@Request() req, @Param('id') id: string, @Res() res: Response) {
+    async downloadPdf(@Request() req, @Param('id') id: string, @Query('format') format: 'pdf' | 'facturx' | 'xml' | 'excel' = 'pdf', @Res() res: Response) {
+
+        // Excel Export
+        if (format === 'excel') {
+            return this.dataOpsService.exportData('invoices', 'xlsx', res, req.user.companyId, id);
+        }
         const invoice = await this.invoicesService.findOne(req.user.companyId, id);
         if (!invoice) {
             throw new NotFoundException('Invoice not found');
         }
 
         const template = await this.templatesService.getDefault(req.user.companyId);
-        const visualBuffer = await this.pdfService.generateInvoice(invoice, template);
-        const buffer = await this.facturXService.applyFacturX(invoice, Buffer.from(visualBuffer));
+
+        // XML Only
+        if (format === 'xml') {
+            const xml = this.facturXService.generateXml(invoice as any);
+            res.set({
+                'Content-Type': 'text/xml',
+                'Content-Disposition': `attachment; filename=factur-x-${invoice.invoiceNumber}.xml`,
+            });
+            return res.send(xml);
+        }
+
+        // PDF or Factur-X (Hybrid)
+        // Map format to service enum ('PDF' | 'FACTURX')
+        const serviceFormat = format === 'facturx' ? 'FACTURX' : 'PDF';
+        const buffer = await this.pdfService.generateInvoice(invoice as any, template, serviceFormat);
 
         res.set({
             'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename=invoice-${invoice.invoiceNumber}.pdf`,
+            'Content-Disposition': `attachment; filename=invoice-${invoice.invoiceNumber}${format === 'facturx' ? '-fx' : ''}.pdf`,
             'Content-Length': buffer.length,
         });
 
-        res.end(buffer);
+        res.end(Buffer.from(buffer));
     }
 
     @Post(':id/send')
@@ -90,15 +111,12 @@ export class InvoicesController {
         if (!invoice) throw new NotFoundException('Invoice not found');
         if (!invoice.client || !invoice.client.email) throw new BadRequestException('Client has no email');
 
-        // Generate PDF
+        // Generate PDF (Factur-X by default for email)
         const template = await this.templatesService.getDefault(req.user.companyId);
-        const visualBuffer = await this.pdfService.generateInvoice(invoice, template);
-
-        // Apply Factur-X
-        const pdfBuffer = await this.facturXService.applyFacturX(invoice, Buffer.from(visualBuffer));
+        const pdfBuffer = await this.pdfService.generateInvoice(invoice as any, template, 'FACTURX');
 
         // Send Email
-        await this.mailService.sendInvoice(invoice.client.email, invoice.invoiceNumber, pdfBuffer);
+        await this.mailService.sendInvoice(invoice.client.email, invoice.invoiceNumber, Buffer.from(pdfBuffer));
 
         return { success: true, message: 'Email sent successfully' };
     }

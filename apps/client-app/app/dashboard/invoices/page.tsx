@@ -11,6 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import invoiceService from "@/services/invoice.service"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/providers/toast-provider"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function InvoicesPage() {
     const [invoices, setInvoices] = useState<any[]>([])
@@ -49,7 +55,9 @@ export default function InvoicesPage() {
 
     const handleBulkExport = async (format: 'xlsx' | 'csv') => {
         try {
-            const token = getCookie('token');
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/data-ops/export/invoices?format=${format}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -68,20 +76,36 @@ export default function InvoicesPage() {
         }
     }
 
-    const downloadInvoice = async (id: string, invoiceNumber: string) => {
+    const downloadInvoice = async (id: string, invoiceNumber: string, format: 'pdf' | 'facturx' | 'xml' | 'excel' = 'pdf') => {
         try {
-            const blob = await invoiceService.downloadPdf(id);
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                toast.error("Erreur", "Vous n'êtes pas connecté");
+                return;
+            }
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoices/${id}/pdf?format=${format}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error("Download failed");
+
+            const blob = await res.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `invoice-${invoiceNumber}.pdf`;
+
+            let ext = 'pdf';
+            if (format === 'xml') ext = 'xml';
+            if (format === 'excel') ext = 'xlsx';
+
+            a.download = `invoice-${invoiceNumber}${format === 'facturx' ? '-fx' : ''}.${ext}`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
+            toast.success("Téléchargement lancé", `Format: ${format.toUpperCase()}`);
         } catch (error) {
             console.error("Download failed", error);
-            alert("Erreur lors du téléchargement");
+            toast.error("Erreur", "Le téléchargement a échoué.");
         }
     }
 
@@ -206,11 +230,22 @@ export default function InvoicesPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {invoices.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="p-8 text-center text-slate-400">
-                                        Aucun document trouvé.
-                                    </td>
-                                </tr>
+                                <td colSpan={6} className="h-96">
+                                    <div className="flex flex-col items-center justify-center text-center h-full text-slate-500">
+                                        <div className="bg-slate-50 p-6 rounded-full mb-4">
+                                            <FileText className="h-12 w-12 text-slate-300" />
+                                        </div>
+                                        <h3 className="text-lg font-medium text-slate-900">Aucun document pour le moment</h3>
+                                        <p className="max-w-sm mt-2 text-sm text-slate-400">
+                                            Commencez par créer votre première facture ou devis pour voir apparaître vos données ici.
+                                        </p>
+                                        <Button asChild className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200">
+                                            <Link href="/dashboard/invoices/new">
+                                                <Plus className="mr-2 h-4 w-4" /> Créer mon premier document
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </td>
                             ) : (
                                 filteredInvoices.map((invoice) => (
                                     <tr key={invoice.id} className="hover:bg-slate-50 transition-colors group">
@@ -262,9 +297,27 @@ export default function InvoicesPage() {
                                                     <Mail className="h-4 w-4" />
                                                 </Button>
 
-                                                <Button variant="ghost" size="icon" onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber)} className="hover:text-slate-900">
-                                                    <Download className="h-4 w-4" />
-                                                </Button>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="hover:text-slate-900">
+                                                            <Download className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'pdf')}>
+                                                            <FileText className="mr-2 h-4 w-4" /> PDF Standard
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'facturx')} className="text-indigo-600 bg-indigo-50/50">
+                                                            <FileSpreadsheet className="mr-2 h-4 w-4" /> Factur-X (2026)
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'xml')}>
+                                                            <FileWarning className="mr-2 h-4 w-4" /> XML Données
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'excel')}>
+                                                            <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel (Détail)
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
 
                                                 {invoice.status === 'DRAFT' && (
                                                     <Button variant="ghost" size="icon" onClick={() => deleteInvoice(invoice.id, invoice.invoiceNumber)} className="hover:text-red-600">

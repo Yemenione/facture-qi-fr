@@ -66,6 +66,12 @@
   }
 }
 
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -92,26 +98,36 @@
     size: auto;
   }
 
+  /* 1. HIDE EVERYTHING */
   body {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+    visibility: hidden;
   }
 
-  /* Hide non-printable elements */
-  .no-print,
-  header,
-  nav,
-  aside {
-    display: none !important;
-  }
-
-  /* Ensure invoice container fits */
+  /* 2. SHOW ONLY INVOICE PREVIEW */
   #invoice-preview {
-    border: none !important;
-    box-shadow: none !important;
+    visibility: visible !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    min-height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    width: 100% !important;
-    max-width: none !important;
+    background: white !important;
+    z-index: 9999;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  /* Show children of invoice preview */
+  #invoice-preview * {
+    visibility: visible !important;
+  }
+
+  /* 3. OPTIMIZE PRINT COLOR */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
