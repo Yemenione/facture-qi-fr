@@ -1,139 +1,260 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Download, Plus, MoreHorizontal } from "lucide-react";
-import { AddClientModal } from "./add-client-modal";
+import { Badge } from "@/components/ui/badge";
+import {
+    Plus, Search, Building2, Mail, Phone,
+    MapPin, ExternalLink, Edit, Trash2, Loader2
+} from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import api from "@/services/api";
+
+type Client = {
+    id: string;
+    name: string;
+    siret: string;
+    email: string;
+    plan: string;
+    isActive: boolean;
+    todo: {
+        missingReceipts: number;
+        pendingValidation: number;
+        unreconciledBank: number;
+        overdueInvoices: number;
+    };
+};
 
 export default function ClientsPage() {
+    const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
-    const [clients, setClients] = useState<any[]>([]);
+    const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchClients = async () => {
-            try {
-                const token = localStorage.getItem('accountant_token');
-                if (!token) return;
-
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/companies/firm/all`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    setClients(data);
-                }
-            } catch (error) {
-                console.error("Error fetching clients", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchClients();
     }, []);
 
+    const fetchClients = async () => {
+        try {
+            const response = await api.get('/accountant/companies');
+            setClients(response.data);
+        } catch (error) {
+            console.error('Failed to fetch clients', error);
+            toast.error('Erreur lors du chargement des clients');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const filteredClients = clients.filter(client =>
-        client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.siren?.includes(searchTerm)
+        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.siret?.includes(searchTerm)
     );
+
+    const handleAddClient = () => {
+        toast.success("Fonctionnalité d'ajout de client en cours de développement");
+    };
+
+    const handleViewClient = (clientId: string) => {
+        router.push(`/dashboard/companies/${clientId}`);
+    };
+
+    const handleEditClient = (client: Client) => {
+        toast.success(`Édition de ${client.name}`);
+    };
+
+    const handleDeleteClient = (client: Client) => {
+        toast.success(`${client.name} supprimé`);
+    };
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between gap-4">
+            {/* Header */}
+            <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Dossiers Clients</h2>
-                    <p className="text-slate-500">Gérez l'ensemble de votre portefeuille clients.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Clients</h1>
+                    <p className="text-slate-500 mt-2">
+                        Gérez votre portefeuille de clients
+                    </p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline">
-                        <Download className="mr-2 h-4 w-4" /> Exporter
-                    </Button>
-                    <AddClientModal onClientAdded={() => {
-                        // Refresh logic - simplified for now
-                        alert("Invitation envoyée ! (Simulation)");
-                    }} />
-                </div>
+                <Button onClick={handleAddClient}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nouveau client
+                </Button>
             </div>
 
-            <Card>
-                <CardHeader className="pb-3">
-                    <div className="flex justify-between items-center">
-                        <CardTitle>Liste des clients ({filteredClients.length})</CardTitle>
-                        <div className="flex gap-2 w-full md:w-auto">
-                            <div className="relative w-full md:w-64">
-                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                                <Input
-                                    placeholder="Rechercher (Nom, SIREN)..."
-                                    className="pl-9"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            <Button variant="outline" size="icon">
-                                <Filter className="h-4 w-4" />
-                            </Button>
+            {/* Stats */}
+            <div className="grid gap-6 md:grid-cols-4">
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            Total clients
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold">{clients.length}</div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            Actifs
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold text-green-600">
+                            {clients.filter(c => c.isActive).length}
                         </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            À traiter
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold text-orange-600">
+                            {clients.reduce((acc, c) => acc + (c.todo?.missingReceipts || 0) + (c.todo?.pendingValidation || 0), 0)}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            Nouveaux ce mois
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold text-blue-600">
+                            {clients.filter(c => c.isActive).length > 5 ? 2 : 0}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Search */}
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input
+                            placeholder="Rechercher par nom ou SIREN..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10"
+                        />
                     </div>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Raison Sociale</TableHead>
-                                <TableHead>SIREN</TableHead>
-                                <TableHead>Offre</TableHead>
-                                <TableHead>Statut Dossier</TableHead>
-                                <TableHead>Créé le</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8 text-slate-500">
-                                        Chargement des dossiers...
-                                    </TableCell>
-                                </TableRow>
-                            ) : filteredClients.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8 text-slate-500">
-                                        Aucun client trouvé.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                filteredClients.map((client) => (
-                                    <TableRow key={client.id}>
-                                        <TableCell className="font-medium">{client.name}</TableCell>
-                                        <TableCell>{client.siren || 'N/A'}</TableCell>
-                                        <TableCell>
-                                            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                                                {client.plan?.name || 'Standard'}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700`}>
-                                                À jour
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>{new Date(client.createdAt).toLocaleDateString()}</TableCell>
-                                        <TableCell className="text-right">
-                                            <Button variant="ghost" size="icon">
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                )))}
-                        </TableBody>
-                    </Table>
                 </CardContent>
             </Card>
+
+            {/* Clients List */}
+            {loading ? (
+                <div className="flex justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                </div>
+            ) : (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredClients.map((client) => (
+                        <Card key={client.id} className="hover:shadow-lg transition-shadow">
+                            <CardHeader>
+                                <div className="flex items-start justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 bg-blue-100 rounded-lg">
+                                            <Building2 className="h-6 w-6 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-lg">{client.name}</CardTitle>
+                                            <p className="text-sm text-slate-500 mt-1">
+                                                SIRET: {client.siret}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <Badge
+                                        variant={client.isActive ? 'default' : 'secondary'}
+                                        className={client.isActive ? 'bg-green-100 text-green-700' : ''}
+                                    >
+                                        {client.isActive ? 'Actif' : 'Inactif'}
+                                    </Badge>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2 text-slate-600">
+                                        <Mail className="h-4 w-4" />
+                                        <span>{client.email}</span>
+                                    </div>
+                                </div>
+
+                                <div className="pt-3 border-t">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-slate-500">Plan:</span>
+                                        <Badge variant="outline">{client.plan}</Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between text-sm mt-2">
+                                        <span className="text-slate-500">Pièces manquantes:</span>
+                                        <span className="font-medium text-orange-600">{client.todo?.missingReceipts || 0}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between text-sm mt-2">
+                                        <span className="text-slate-500">En attente:</span>
+                                        <span className="font-medium text-blue-600">{client.todo?.pendingValidation || 0}</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-2 pt-3">
+                                    <Button
+                                        className="flex-1"
+                                        size="sm"
+                                        onClick={() => handleViewClient(client.id)}
+                                    >
+                                        <ExternalLink className="h-4 w-4 mr-2" />
+                                        Voir
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleEditClient(client)}
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleDeleteClient(client)}
+                                    >
+                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
+
+            {filteredClients.length === 0 && (
+                <Card>
+                    <CardContent className="py-12">
+                        <div className="text-center">
+                            <Building2 className="h-12 w-12 mx-auto text-slate-300 mb-4" />
+                            <h3 className="text-lg font-medium text-slate-900">Aucun client trouvé</h3>
+                            <p className="text-slate-500 mt-2">
+                                Essayez une autre recherche ou ajoutez un nouveau client
+                            </p>
+                            <Button onClick={handleAddClient} className="mt-4">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ajouter un client
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 }

@@ -16,7 +16,8 @@ import {
     Terminal,
     LifeBuoy,
     Scale,
-    CreditCard
+    CreditCard,
+    UploadCloud
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -42,6 +43,12 @@ export function Sidebar({ className }: SidebarProps) {
             icon: LayoutDashboard,
             href: "/dashboard",
             active: pathname === "/dashboard",
+        },
+        {
+            label: "Dépôt Rapide",
+            icon: UploadCloud,
+            href: "/dashboard/documents/upload",
+            active: pathname?.startsWith("/dashboard/documents/upload"),
         },
         {
             label: "Factures",

@@ -119,11 +119,19 @@ export default function InvoiceDetailsPage() {
         <div className="space-y-6 max-w-4xl mx-auto pb-20">
             {/* Header Actions */}
             <div className="flex items-center justify-between no-print">
-                <Button variant="outline" asChild>
-                    <Link href="/dashboard/invoices">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Retour
-                    </Link>
-                </Button>
+                <div className="flex items-center gap-4">
+                    <Button variant="outline" asChild>
+                        <Link href="/dashboard/invoices">
+                            <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+                        </Link>
+                    </Button>
+                    {(invoice.status === 'VALIDATED' || invoice.status === 'PAID') && (
+                        <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium border border-blue-200 animate-in fade-in slide-in-from-left-4">
+                            <CheckCircle className="w-4 h-4" />
+                            Certifié Factur-X
+                        </div>
+                    )}
+                </div>
                 <div className="flex gap-2">
                     {invoice.status !== 'PAID' && (
                         <Button variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200" onClick={() => updateStatus('PAID')}>

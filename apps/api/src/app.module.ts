@@ -32,6 +32,10 @@ import { CompanySettingsModule } from './modules/company-settings/company-settin
 import { ExportsModule } from './modules/exports/exports.module';
 import { AccountingModule } from './modules/accounting/accounting.module';
 import { DunningModule } from './modules/dunning/dunning.module';
+import { AccountantCompaniesModule } from './modules/accountant-companies/accountant-companies.module';
+import { AutomationModule } from './modules/automation/automation.module';
+import { BankingModule } from './modules/banking/banking.module';
+import { DocumentsModule } from './modules/documents/documents.module';
 
 @Module({
     imports: [
@@ -40,7 +44,7 @@ import { DunningModule } from './modules/dunning/dunning.module';
             envFilePath: ['../../.env', '.env'],
         }),
         ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', 'uploads'),
+            rootPath: join(process.cwd(), 'uploads'),
             serveRoot: '/uploads',
         }),
         PrismaModule,
@@ -72,6 +76,10 @@ import { DunningModule } from './modules/dunning/dunning.module';
         ExportsModule,
         AccountingModule,
         DunningModule,
+        AutomationModule,
+        BankingModule,
+        AccountantCompaniesModule,
+        DocumentsModule,
     ],
     controllers: [],
     providers: [],

@@ -68,6 +68,16 @@ const expensesService = {
         await axios.patch(`${API_URL}/expenses/${id}/status`, { status }, {
             headers: getAuthHeader(),
         });
+    },
+
+    scan: async (data: FormData): Promise<any> => {
+        const response = await axios.post(`${API_URL}/expenses/scan`, data, {
+            headers: {
+                ...getAuthHeader(),
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
     }
 };
 

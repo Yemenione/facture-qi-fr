@@ -12,17 +12,32 @@ export default function AuthCallbackPage() {
 
     useEffect(() => {
         const token = searchParams.get('token');
+        const from = searchParams.get('from');
+
+        console.log('[AuthCallback] Token:', token ? 'Present' : 'Missing');
+        console.log('[AuthCallback] From:', from);
+
         if (token) {
             localStorage.setItem('access_token', token);
-            // Verify token validity by calling checkAuth or fetch user profile if needed
-            // For now, assume token is valid and set auth state
-            // Ideally we should have a 'verify' endpoint or decode token
-            checkAuth();
+
+            // Expert Mode Trigger
+            if (from === 'accountant') {
+                sessionStorage.setItem('isExpertMode', 'true');
+                console.log('[AuthCallback] Expert Mode ACTIVATED');
+            } else {
+                sessionStorage.removeItem('isExpertMode');
+            }
+
+            // Update store with token
+            useAuthStore.setState({ token, isAuthenticated: true });
+
+            console.log('[AuthCallback] Redirecting to dashboard...');
             router.push('/dashboard');
         } else {
+            console.error('[AuthCallback] No token found, redirecting to login');
             router.push('/login?error=auth_failed');
         }
-    }, [router, searchParams, checkAuth]);
+    }, [router, searchParams]);
 
     return (
         <div className="flex h-screen items-center justify-center">

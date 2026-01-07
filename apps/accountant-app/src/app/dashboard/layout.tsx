@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Building2, Users, FileText, Settings, LogOut, Zap, LayoutDashboard } from "lucide-react";
+import { Building2, Users, FileText, Settings, LogOut, Zap, LayoutDashboard, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({
@@ -18,12 +18,13 @@ export default function DashboardLayout({
         router.push("/login");
     };
 
-    const navItems = [
-        { href: "/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
-        { href: "/dashboard/clients", label: "Dossiers Clients", icon: Users },
-        { href: "/dashboard/automation", label: "Automatisation", icon: Zap },
-        { href: "/dashboard/documents", label: "Documents", icon: FileText },
-        { href: "/dashboard/settings", label: "Paramètres Cabinet", icon: Settings },
+    const navigation = [
+        { name: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
+        { name: 'Clients', href: '/dashboard/clients', icon: Users },
+        { name: 'Documents', href: '/dashboard/documents', icon: FileText },
+        { name: 'Automation', href: '/dashboard/automation', icon: Zap },
+        { name: 'Rapports', href: '/dashboard/reports', icon: BarChart3 },
+        { name: 'Paramètres', href: '/dashboard/settings', icon: Settings },
     ];
 
     return (
@@ -40,7 +41,7 @@ export default function DashboardLayout({
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1">
-                    {navItems.map((item) => {
+                    {navigation.map((item) => {
                         const Icon = item.icon;
                         // Simple active check
                         const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
@@ -48,14 +49,13 @@ export default function DashboardLayout({
                             <Link key={item.href} href={item.href}>
                                 <Button
                                     variant="ghost"
-                                    className={`w-full justify-start text-sm font-medium h-11 ${
-                                        isActive 
-                                        ? "bg-blue-600 text-white hover:bg-blue-700" 
+                                    className={`w-full justify-start text-sm font-medium h-11 ${isActive
+                                        ? "bg-blue-600 text-white hover:bg-blue-700"
                                         : "text-slate-400 hover:text-white hover:bg-slate-800"
-                                    }`}
+                                        }`}
                                 >
                                     <Icon className="w-5 h-5 mr-3" />
-                                    {item.label}
+                                    {item.name}
                                 </Button>
                             </Link>
                         );
@@ -63,9 +63,9 @@ export default function DashboardLayout({
                 </nav>
 
                 <div className="p-4 border-t border-slate-800">
-                    <Button 
-                        variant="ghost" 
-                        onClick={handleLogout} 
+                    <Button
+                        variant="ghost"
+                        onClick={handleLogout}
                         className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-900/20"
                     >
                         <LogOut className="w-5 h-5 mr-3" />
@@ -78,12 +78,12 @@ export default function DashboardLayout({
             <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
                 <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-10">
                     <h1 className="font-semibold text-slate-800">
-                        {navItems.find(i => i.href === pathname)?.label || "Tableau de bord"}
+                        {navigation.find(i => i.href === pathname)?.name || "Tableau de bord"}
                     </h1>
                     <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs ring-2 ring-white cursor-pointer hover:bg-blue-200 transition-colors">
-                             EX
-                         </div>
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs ring-2 ring-white cursor-pointer hover:bg-blue-200 transition-colors">
+                            EX
+                        </div>
                     </div>
                 </header>
                 <main className="flex-1 p-6 overflow-auto">

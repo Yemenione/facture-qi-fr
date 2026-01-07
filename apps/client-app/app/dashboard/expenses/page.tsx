@@ -74,6 +74,33 @@ export default function ExpensesPage() {
     }, [])
 
     const [file, setFile] = useState<File | null>(null)
+    const [scanning, setScanning] = useState(false)
+
+    const handleScan = async () => {
+        if (!file) return;
+        try {
+            setScanning(true);
+            const data = new FormData();
+            data.append('file', file);
+            const result = await expensesService.scan(data);
+
+            if (result.detected) {
+                setFormData(prev => ({
+                    ...prev,
+                    amount: result.detected.amount ? result.detected.amount.toString() : prev.amount,
+                    date: result.detected.date ? new Date(result.detected.date).toISOString().split('T')[0] : prev.date,
+                    supplier: result.detected.supplier || prev.supplier,
+                    description: prev.description || 'Expense from Receipt'
+                }));
+                toast.success("Receipt scanned & fields updated!");
+            }
+        } catch (e) {
+            console.error(e);
+            toast.error("Scan failed. Please fill manually.");
+        } finally {
+            setScanning(false);
+        }
+    }
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -244,12 +271,25 @@ export default function ExpensesPage() {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="receipt">Receipt (Optional)</Label>
-                                    <Input
-                                        id="receipt"
-                                        type="file"
-                                        accept="image/*,.pdf"
-                                        onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-                                    />
+                                    <div className="flex gap-2">
+                                        <Input
+                                            id="receipt"
+                                            type="file"
+                                            accept="image/*,.pdf"
+                                            onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                                        />
+                                        {file && (
+                                            <Button
+                                                type="button"
+                                                onClick={handleScan}
+                                                variant="secondary"
+                                                className="shrink-0 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                                                disabled={scanning}
+                                            >
+                                                {scanning ? "Scanning..." : "Magic Scan ✨"}
+                                            </Button>
+                                        )}
+                                    </div>
                                     {file && <p className="text-xs text-green-600">Selected: {file.name}</p>}
                                 </div>
 

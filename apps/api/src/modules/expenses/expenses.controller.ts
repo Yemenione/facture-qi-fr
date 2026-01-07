@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, Patch, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
+import { UpdateExpenseDto } from './dto/update-expense.dto'; // Added this import
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -32,6 +33,33 @@ export class ExpensesController {
         return this.expensesService.create(req.user.companyId, dto);
     }
 
+    @Post('scan')
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: './uploads/receipts',
+            filename: (req, file, cb) => {
+                const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
+                return cb(null, `${randomName}${extname(file.originalname)}`);
+            }
+        })
+    }))
+    async scan(@Request() req, @UploadedFile() file: Express.Multer.File) {
+        if (!file) {
+            throw new Error('File is required');
+        }
+
+        // Read the file buffer for OCR
+        const fs = require('fs');
+        const fileBuffer = fs.readFileSync(file.path);
+
+        const scanResult = await this.expensesService.scanReceipt(fileBuffer);
+
+        return {
+            ...scanResult,
+            url: `/uploads/receipts/${file.filename}`
+        };
+    }
+
     @Get()
     findAll(@Request() req) {
         return this.expensesService.findAll(req.user.companyId);
@@ -50,5 +78,13 @@ export class ExpensesController {
     @Patch(':id/status')
     updateStatus(@Request() req, @Param('id') id: string, @Body('status') status: any) {
         return this.expensesService.updateStatus(req.user.companyId, id, status);
+    }
+
+    @Patch(':id/validate')
+    async validate(
+        @Param('id') id: string,
+        @Body() body: { status: 'APPROVED' | 'REJECTED'; note?: string }
+    ) {
+        return this.expensesService.validateExpense(id, body.status, body.note);
     }
 }

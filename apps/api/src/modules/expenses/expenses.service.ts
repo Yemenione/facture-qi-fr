@@ -2,9 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 
+import { OcrService } from '../automation/ocr.service';
+
 @Injectable()
 export class ExpensesService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private ocrService: OcrService
+    ) { }
 
     async create(companyId: string, dto: CreateExpenseDto) {
         return this.prisma.expense.create({
@@ -51,5 +56,31 @@ export class ExpensesService {
             where: { id, companyId },
             data: { status }
         });
+    }
+
+    async scanReceipt(fileBuffer: Buffer) {
+        const ocrResult = await this.ocrService.processImage(fileBuffer);
+        return {
+            detected: {
+                amount: ocrResult.total,
+                date: ocrResult.date,
+                supplier: ocrResult.merchant,
+                rawText: ocrResult.rawText
+            }
+        };
+    }
+
+    async validateExpense(id: string, status: 'APPROVED' | 'REJECTED', note?: string) {
+        const expense = await this.prisma.expense.update({
+            where: { id },
+            data: {
+                status
+            },
+            include: {
+                company: { select: { name: true } }
+            }
+        });
+
+        return expense;
     }
 }

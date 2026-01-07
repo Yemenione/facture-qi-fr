@@ -8,6 +8,8 @@ import { PdfService } from '../pdf/pdf.service';
 import { MailService } from '../mail/mail.service';
 import { TemplatesService } from '../templates/templates.service';
 
+import { FacturXGeneratorService } from './facturx-generator.service';
+
 @Controller('invoices')
 @UseGuards(JwtAuthGuard, CompanyScopeGuard)
 export class InvoicesController {
@@ -15,7 +17,8 @@ export class InvoicesController {
         private readonly invoicesService: InvoicesService,
         private readonly pdfService: PdfService,
         private readonly mailService: MailService,
-        private readonly templatesService: TemplatesService
+        private readonly templatesService: TemplatesService,
+        private readonly facturXService: FacturXGeneratorService
     ) { }
 
     @Post()
@@ -69,7 +72,8 @@ export class InvoicesController {
         }
 
         const template = await this.templatesService.getDefault(req.user.companyId);
-        const buffer = await this.pdfService.generateInvoice(invoice, template);
+        const visualBuffer = await this.pdfService.generateInvoice(invoice, template);
+        const buffer = await this.facturXService.applyFacturX(invoice, Buffer.from(visualBuffer));
 
         res.set({
             'Content-Type': 'application/pdf',
@@ -88,10 +92,10 @@ export class InvoicesController {
 
         // Generate PDF
         const template = await this.templatesService.getDefault(req.user.companyId);
-        const buffer = await this.pdfService.generateInvoice(invoice, template);
+        const visualBuffer = await this.pdfService.generateInvoice(invoice, template);
 
-        // Convert Uint8Array to Buffer
-        const pdfBuffer = Buffer.from(buffer);
+        // Apply Factur-X
+        const pdfBuffer = await this.facturXService.applyFacturX(invoice, Buffer.from(visualBuffer));
 
         // Send Email
         await this.mailService.sendInvoice(invoice.client.email, invoice.invoiceNumber, pdfBuffer);

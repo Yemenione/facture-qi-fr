@@ -114,6 +114,7 @@ model Company {
   apiKeys         ApiKey[]
   settings        CompanySettings?
   expenses        Expense[]
+  bankAccounts    BankAccount[]
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -237,9 +238,13 @@ model Client {
   company     Company  @relation(fields: [companyId], references: [id])
   invoices    Invoice[]
   
+  accountingCode String? // Custom aux code (e.g. CLIENT001)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+
 
 model Product {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -248,6 +253,8 @@ model Product {
   price       Float    // Decimal is tricky in Mongo, using Float for simplicity or Int (cents) is often easier. Let's stick to Float/Int or keep Decimal if mapped correctly.
   vatRate     Float
   unit        String   @default("piece") // jour, heure, forfait, etc.
+  
+  accountingAccount String? // Override default sales account (e.g. 706xxx)
   
   companyId   String   @db.ObjectId
   company     Company  @relation(fields: [companyId], references: [id])
@@ -436,6 +443,11 @@ model CompanySettings {
   defaultPaymentTerms String @default("Paiement à 30 jours")
   defaultLegalMention String?
   defaultPenaltyRate  String @default("3 fois le taux d'intérêt légal")
+
+  // Accounting Defaults (FEC)
+  defaultSalesAccount     String @default("706000")
+  defaultVatAccount       String @default("445710")
+  defaultPurchasesAccount String @default("606400")
   
   // Relations
   companyId   String   @unique @db.ObjectId
@@ -527,8 +539,56 @@ model Expense {
   companyId   String   @db.ObjectId
   company     Company  @relation(fields: [companyId], references: [id])
   
+  // OCR Data
+  detectedData Json?   // Raw OCR results { text, confidence, entities }
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   @@index([companyId])
+}
+
+// --------------------------------------
+// BANKING & RECONCILIATION
+// --------------------------------------
+
+model BankAccount {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   // "Compte Principal", "Livret A"
+  iban        String?
+  currency    String   @default("EUR")
+  bankName    String?
+  
+  companyId   String   @db.ObjectId
+  company     Company  @relation(fields: [companyId], references: [id])
+  
+  transactions BankTransaction[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BankTransaction {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  externalId  String?  // ID from bank/import
+  date        DateTime
+  amount      Float
+  label       String
+  reference   String?
+  category    String?
+  
+  status      String   @default("PENDING") // PENDING, MATCHED, IGNORED
+  
+  // Reconciliation Links
+  linkedInvoiceId String? @db.ObjectId // Linked to Sales Invoice
+  linkedExpenseId String? @db.ObjectId // Linked to Purchase Expense
+  
+  bankAccountId String   @db.ObjectId
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([bankAccountId])
+  @@index([date])
 }

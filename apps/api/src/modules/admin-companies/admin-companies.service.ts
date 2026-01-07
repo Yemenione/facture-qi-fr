@@ -16,7 +16,8 @@ export class AdminCompaniesService {
             include: {
                 users: true,
                 invoices: { select: { id: true } },
-                plan: true
+                plan: true,
+                expenses: { where: { status: 'PENDING' }, select: { id: true } }
             },
             orderBy: { createdAt: 'desc' }
         }).then(companies => companies.map(c => ({
@@ -28,6 +29,7 @@ export class AdminCompaniesService {
             isActive: c.subscriptionStatus === 'ACTIVE',
             usersCount: c.users.length,
             invoicesCount: c.invoices.length,
+            documentsPendingCount: c.expenses.length,
             stripeCustomerId: c.stripeCustomerId,
             features: (c as any).features || (c.plan as any)?.features || {}, // Merge or fallback
             createdAt: c.createdAt

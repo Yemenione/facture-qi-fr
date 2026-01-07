@@ -1,142 +1,231 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, CheckCircle, AlertTriangle, FileInput, Zap, ArrowRight, TrendingUp } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import {
+    Zap, Bot, Mail, FileText, TrendingUp,
+    CheckCircle2, Clock, AlertCircle
+} from "lucide-react";
+import { toast } from "sonner";
+
+type AutomationRule = {
+    id: string;
+    name: string;
+    description: string;
+    enabled: boolean;
+    category: string;
+    icon: any;
+    stats?: {
+        triggered: number;
+        saved: string;
+    };
+};
 
 export default function AutomationPage() {
-    const [stats, setStats] = useState({
-        processedCount: 0,
-        pendingCount: 0,
-        activeConnectors: 0
-    });
+    const [rules, setRules] = useState<AutomationRule[]>([
+        {
+            id: "1",
+            name: "Validation automatique",
+            description: "Valider automatiquement les dépenses < 50€ avec justificatif",
+            enabled: true,
+            category: "Validation",
+            icon: CheckCircle2,
+            stats: { triggered: 142, saved: "4.2h" }
+        },
+        {
+            id: "2",
+            name: "Rappel échéances TVA",
+            description: "Envoyer un email 7 jours avant l'échéance TVA",
+            enabled: true,
+            category: "Notifications",
+            icon: Mail,
+            stats: { triggered: 24, saved: "1.5h" }
+        },
+        {
+            id: "3",
+            name: "Catégorisation intelligente",
+            description: "Catégoriser automatiquement les dépenses par IA",
+            enabled: false,
+            category: "IA",
+            icon: Bot,
+            stats: { triggered: 0, saved: "0h" }
+        },
+        {
+            id: "4",
+            name: "Génération FEC automatique",
+            description: "Générer le FEC le 1er de chaque mois",
+            enabled: true,
+            category: "Comptabilité",
+            icon: FileText,
+            stats: { triggered: 12, saved: "6h" }
+        },
+        {
+            id: "5",
+            name: "Rapprochement bancaire",
+            description: "Suggérer automatiquement les correspondances",
+            enabled: true,
+            category: "Banque",
+            icon: TrendingUp,
+            stats: { triggered: 89, saved: "8.5h" }
+        }
+    ]);
 
-    useEffect(() => {
-        // Here we would fetch /automation/stats
-        setStats({
-            processedCount: 1248,
-            pendingCount: 34,
-            activeConnectors: 128
-        });
-    }, []);
+    const toggleRule = (id: string) => {
+        setRules(rules.map(rule =>
+            rule.id === id ? { ...rule, enabled: !rule.enabled } : rule
+        ));
+        toast.success("Règle mise à jour");
+    };
+
+    const totalTimeSaved = rules.reduce((acc, rule) => {
+        if (!rule.stats) return acc;
+        const hours = parseFloat(rule.stats.saved);
+        return acc + hours;
+    }, 0);
+
+    const totalTriggered = rules.reduce((acc, rule) =>
+        acc + (rule.stats?.triggered || 0), 0
+    );
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Centre d'Automatisation</h2>
-                    <p className="text-slate-500">Supervisez la collecte et le traitement automatique des documents.</p>
-                </div>
-                <Button variant="outline" className="gap-2">
-                    <RefreshCw className="w-4 h-4" /> Actualiser les flux
-                </Button>
+            {/* Header */}
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Automation</h1>
+                <p className="text-slate-500 mt-2">
+                    Automatisez vos tâches répétitives et gagnez du temps
+                </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-                <Card className="bg-gradient-to-br from-blue-50 to-white border-blue-100 shadow-sm relative overflow-hidden group hover:border-blue-200 transition-all">
-                    <div className="absolute right-0 top-0 w-24 h-24 bg-blue-100/50 rounded-bl-full -mr-4 -mt-4 opacity-50 transition-transform group-hover:scale-110" />
-                    <CardHeader className="pb-2">
-                        <CardDescription className="text-blue-600 font-bold flex items-center">
-                            <Zap className="w-3 h-3 mr-1" />
-                            Factures Traitées
-                        </CardDescription>
-                        <CardTitle className="text-4xl text-blue-900">{stats.processedCount.toLocaleString()}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-xs text-blue-600/80 flex items-center font-medium bg-blue-100/50 w-fit px-2 py-1 rounded-full">
-                            <TrendingUp className="w-3 h-3 mr-1" /> +12% vs mois dernier
-                        </div>
-                    </CardContent>
-                </Card>
-                
-                <Card className="shadow-sm border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-2">
-                        <CardDescription className="text-orange-600 font-bold flex items-center">
-                            <AlertTriangle className="w-3 h-3 mr-1" />
-                            À Valider
-                        </CardDescription>
-                        <CardTitle className="text-4xl text-orange-600">{stats.pendingCount}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex justify-between items-center">
-                            <span className="text-xs text-slate-500">Documents incertains</span>
-                            <Button variant="ghost" size="sm" className="h-auto p-0 text-orange-600 hover:text-orange-700 hover:bg-transparent font-medium">
-                                Traiter <ArrowRight className="w-3 h-3 ml-1" />
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="shadow-sm border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-2">
-                        <CardDescription className="text-green-600 font-bold flex items-center">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Connecteurs Actifs
-                        </CardDescription>
-                        <CardTitle className="text-4xl text-green-600">{stats.activeConnectors}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-xs text-slate-500">Banques & Outils connectés</div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-                <Card className="h-full">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg">
-                            <RefreshCw className="w-5 h-5 text-blue-600" />
-                            Flux Bancaires
+            {/* Stats Cards */}
+            <div className="grid gap-6 md:grid-cols-3">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            Règles actives
                         </CardTitle>
-                        <CardDescription>État de la synchronisation en temps réel</CardDescription>
+                        <Zap className="h-4 w-4 text-slate-400" />
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-3">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <div key={i} className="flex items-center justify-between p-3 bg-white border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all rounded-lg group cursor-pointer">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-2 h-2 rounded-full ${i === 3 ? 'bg-red-500 animate-pulse ring-2 ring-red-100' : 'bg-green-500'}`} />
-                                        <div className="flex flex-col">
-                                            <span className="font-medium text-sm text-slate-700">Client {i} - BNP Paribas</span>
-                                            <span className="text-xs text-slate-400">Dernière synchro: 14:0{i}</span>
-                                        </div>
+                        <div className="text-3xl font-bold">
+                            {rules.filter(r => r.enabled).length}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">
+                            sur {rules.length} règles
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            Déclenchements
+                        </CardTitle>
+                        <Clock className="h-4 w-4 text-slate-400" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold">
+                            {totalTriggered}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">
+                            ce mois-ci
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">
+                            Temps gagné
+                        </CardTitle>
+                        <TrendingUp className="h-4 w-4 text-slate-400" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold text-green-600">
+                            {totalTimeSaved.toFixed(1)}h
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">
+                            ce mois-ci
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Rules List */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Règles d'automation</CardTitle>
+                    <CardDescription>
+                        Activez ou désactivez les règles selon vos besoins
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {rules.map((rule) => {
+                        const Icon = rule.icon;
+                        return (
+                            <div
+                                key={rule.id}
+                                className="flex items-center gap-4 p-4 border rounded-lg hover:bg-slate-50 transition-colors"
+                            >
+                                <div className={`p-3 rounded-lg ${rule.enabled ? 'bg-blue-100' : 'bg-slate-100'
+                                    }`}>
+                                    <Icon className={`h-6 w-6 ${rule.enabled ? 'text-blue-600' : 'text-slate-400'
+                                        }`} />
+                                </div>
+
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                        <h3 className="font-medium">{rule.name}</h3>
+                                        <Badge variant="outline" className="text-xs">
+                                            {rule.category}
+                                        </Badge>
                                     </div>
-                                    {i === 3 ? (
-                                        <Button size="sm" variant="outline" className="h-7 text-xs border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
-                                            Reconnecter
-                                        </Button>
-                                    ) : (
-                                        <div className="bg-green-100 text-green-600 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <CheckCircle className="w-3 h-3" />
+                                    <p className="text-sm text-slate-500 mt-1">
+                                        {rule.description}
+                                    </p>
+                                    {rule.stats && (
+                                        <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                                            <span>
+                                                {rule.stats.triggered} déclenchements
+                                            </span>
+                                            <span>•</span>
+                                            <span className="text-green-600 font-medium">
+                                                {rule.stats.saved} gagnées
+                                            </span>
                                         </div>
                                     )}
                                 </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
 
-                <Card className="h-full flex flex-col">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg">
-                            <FileInput className="w-5 h-5 text-blue-600" />
-                            File d'attente OCR
-                        </CardTitle>
-                        <CardDescription>Factures en cours d'analyse par l'IA</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500 border-t border-slate-100 min-h-[300px] bg-slate-50/50">
-                        <div className="bg-green-100 p-6 rounded-full mb-4 ring-8 ring-green-50">
-                             <CheckCircle className="w-10 h-10 text-green-600" />
-                        </div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-1">Tout est à jour !</h3>
-                        <p className="max-w-xs mx-auto text-sm">L'intelligence artificielle a traité tous les documents en attente avec succès.</p>
-                        <Button variant="outline" className="mt-8 bg-white shadow-sm">
-                            Voir l'historique de traitement
+                                <Switch
+                                    checked={rule.enabled}
+                                    onCheckedChange={() => toggleRule(rule.id)}
+                                />
+                            </div>
+                        );
+                    })}
+                </CardContent>
+            </Card>
+
+            {/* Coming Soon */}
+            <Card className="border-dashed">
+                <CardContent className="pt-6">
+                    <div className="text-center py-8">
+                        <Bot className="h-12 w-12 mx-auto text-slate-300 mb-4" />
+                        <h3 className="text-lg font-medium text-slate-900">
+                            Plus de règles bientôt disponibles
+                        </h3>
+                        <p className="text-slate-500 mt-2">
+                            Nous travaillons sur de nouvelles automations IA
+                        </p>
+                        <Button variant="outline" className="mt-4">
+                            Suggérer une règle
                         </Button>
-                    </CardContent>
-                </Card>
-            </div>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }

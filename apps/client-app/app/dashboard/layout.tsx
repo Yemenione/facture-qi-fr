@@ -1,5 +1,6 @@
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { AuthGuard } from "@/components/auth/auth-guard"
+import ExpertModeBanner from "@/components/ExpertModeBanner"
 
 export default function DashboardLayout({
     children,
@@ -9,6 +10,7 @@ export default function DashboardLayout({
     return (
         <AuthGuard>
             <div className="hidden md:block">
+                <ExpertModeBanner />
                 <div className="border-b">
                     <div className="flex h-16 items-center px-4">
                         {/* Header Content could go here */}
