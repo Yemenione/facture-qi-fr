@@ -10,15 +10,15 @@ interface SystemComponent {
 }
 
 export default function HealthStatus() {
-    const [components, setComponents] = useState<SystemComponent[]>([
+    const components: SystemComponent[] = [
         { name: 'API Server', status: 'operational', latency: 45, uptime: 99.98 },
         { name: 'Database (MongoDB)', status: 'operational', latency: 12, uptime: 99.99 },
         { name: 'Storage (S3)', status: 'operational', latency: 120, uptime: 99.95 },
         { name: 'Email Service (SMTP)', status: 'operational', latency: 300, uptime: 99.50 },
         { name: 'Stripe Webhooks', status: 'operational', latency: 85, uptime: 100 },
         { name: 'PDF Generation', status: 'degraded', latency: 1500, uptime: 98.40 },
-    ]);
-    const [lastUpdated, setLastUpdated] = useState(new Date());
+    ];
+    const lastUpdated = new Date();
 
     const getStatusColor = (status: string) => {
         switch (status) {
