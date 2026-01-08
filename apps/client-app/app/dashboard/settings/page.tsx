@@ -77,8 +77,8 @@ export default function SettingsPage() {
                 setCompany((prev: any) => ({
                     ...prev,
                     name: data.name || prev.name,
-                    rcs: data.rcs || prev.rcs,
-                    vatNumber: data.vatNumber || prev.vatNumber,
+                    rcs: (data as any).rcs || prev.rcs,
+                    vatNumber: (data as any).vatNumber || prev.vatNumber,
                     capital: prev.capital, // API might not return this, keep existing
                     legalMentions: prev.legalMentions,
                     address: {
