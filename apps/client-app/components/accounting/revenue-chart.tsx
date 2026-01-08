@@ -18,26 +18,57 @@ export function RevenueChart({ data }: RevenueChartProps) {
     }));
 
     return (
-        <Card className="col-span-2">
+        <Card className="col-span-2 bg-white/5 border-white/10 shadow-sm">
             <CardHeader>
-                <CardTitle>Évolution du Chiffre d'Affaires</CardTitle>
-                <CardDescription>Revenu mensuel HT et TVA collectée.</CardDescription>
+                <CardTitle className="text-zinc-200">Évolution du Chiffre d'Affaires</CardTitle>
+                <CardDescription className="text-zinc-400">Revenu mensuel HT et TVA collectée.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="h-[350px]">
+                <div className="h-[350px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                            <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}€`} />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" />
+                            <XAxis
+                                dataKey="name"
+                                stroke="#666"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                tick={{ fill: '#a1a1aa' }}
+                            />
+                            <YAxis
+                                stroke="#666"
+                                fontSize={12}
+                                tickLine={false}
+                                axisLine={false}
+                                tickFormatter={(value) => `${value}€`}
+                                tick={{ fill: '#a1a1aa' }}
+                            />
                             <Tooltip
                                 formatter={(value: number) => formatCurrency(value)}
-                                cursor={{ fill: 'transparent' }}
-                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                contentStyle={{
+                                    backgroundColor: '#1E1E1E',
+                                    border: '1px solid #333',
+                                    borderRadius: '8px',
+                                    color: '#fff'
+                                }}
                             />
-                            <Legend />
-                            <Bar dataKey="Revenu" fill="#4F46E5" radius={[4, 4, 0, 0]} maxBarSize={50} />
-                            <Bar dataKey="TVA" fill="#94a3b8" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                            <Bar
+                                dataKey="Revenu"
+                                name="Chiffre d'Affaires"
+                                fill="#D4AF37" // Gold
+                                radius={[4, 4, 0, 0]}
+                                maxBarSize={50}
+                            />
+                            <Bar
+                                dataKey="TVA"
+                                name="TVA Collectée"
+                                fill="#2563eb" // Blue
+                                radius={[4, 4, 0, 0]}
+                                maxBarSize={50}
+                            />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

@@ -38,38 +38,40 @@ export function JournalTable() {
     if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin" /></div>
 
     return (
-        <Card className="col-span-full">
+        <Card className="col-span-full bg-white/5 border-white/10 shadow-sm">
             <CardHeader>
-                <CardTitle>Journal des Ventes (Dernières écritures)</CardTitle>
-                <CardDescription>Vue comptable des factures validées et avoirs.</CardDescription>
+                <CardTitle className="text-zinc-200">Journal des Ventes (Dernières écritures)</CardTitle>
+                <CardDescription className="text-zinc-400">Vue comptable des factures validées et avoirs.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Numéro</TableHead>
-                            <TableHead>Client</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead className="text-right">HT (706)</TableHead>
-                            <TableHead className="text-right">TVA (4457)</TableHead>
-                            <TableHead className="text-right">TTC (411)</TableHead>
+                    <TableHeader className="bg-white/5 border-b border-white/10">
+                        <TableRow className="border-white/10 hover:bg-transparent">
+                            <TableHead className="text-zinc-400">Date</TableHead>
+                            <TableHead className="text-zinc-400">Numéro</TableHead>
+                            <TableHead className="text-zinc-400">Client</TableHead>
+                            <TableHead className="text-zinc-400">Type</TableHead>
+                            <TableHead className="text-right text-zinc-400">HT (706)</TableHead>
+                            <TableHead className="text-right text-zinc-400">TVA (4457)</TableHead>
+                            <TableHead className="text-right text-zinc-400">TTC (411)</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {entries.map((entry) => (
-                            <TableRow key={entry.id}>
-                                <TableCell>{new Date(entry.issueDate).toLocaleDateString()}</TableCell>
-                                <TableCell className="font-medium">{entry.invoiceNumber}</TableCell>
-                                <TableCell>{entry.client.name}</TableCell>
+                            <TableRow key={entry.id} className="border-white/10 hover:bg-white/5">
+                                <TableCell className="text-zinc-300">{new Date(entry.issueDate).toLocaleDateString()}</TableCell>
+                                <TableCell className="font-medium text-white">{entry.invoiceNumber}</TableCell>
+                                <TableCell className="text-zinc-300">{entry.client.name}</TableCell>
                                 <TableCell>
-                                    <Badge variant={entry.type === 'CREDIT_NOTE' ? 'destructive' : 'default'}>
+                                    <Badge variant="outline" className={entry.type === 'CREDIT_NOTE'
+                                        ? 'border-red-900/50 bg-red-900/20 text-red-400'
+                                        : 'border-brand-gold/50 bg-brand-gold/10 text-brand-gold'}>
                                         {entry.type === 'CREDIT_NOTE' ? 'AVOIR' : 'FACTURE'}
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="text-right">{formatCurrency(entry.subTotal)}</TableCell>
-                                <TableCell className="text-right text-muted-foreground">{formatCurrency(entry.taxAmount)}</TableCell>
-                                <TableCell className="text-right font-bold">{formatCurrency(entry.total)}</TableCell>
+                                <TableCell className="text-right text-zinc-300">{formatCurrency(entry.subTotal)}</TableCell>
+                                <TableCell className="text-right text-zinc-500">{formatCurrency(entry.taxAmount)}</TableCell>
+                                <TableCell className="text-right font-bold text-white">{formatCurrency(entry.total)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

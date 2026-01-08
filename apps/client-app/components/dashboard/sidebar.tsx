@@ -134,10 +134,10 @@ export function Sidebar({ className }: SidebarProps) {
     ]
 
     return (
-        <div className={cn("flex flex-col h-full bg-slate-50/50 border-r border-slate-200", className)}>
+        <div className={cn("flex flex-col h-full bg-brand-dark border-r border-white/10", className)}>
             <div className="flex-1 py-4 overflow-y-auto">
                 <div className="px-3 py-2">
-                    <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight text-slate-900">
+                    <h2 className="mb-2 px-4 text-lg font-bold tracking-tight text-white">
                         Mon SaaS
                     </h2>
                     <div className="space-y-1">
@@ -146,13 +146,15 @@ export function Sidebar({ className }: SidebarProps) {
                                 key={route.href}
                                 variant={route.active ? "secondary" : "ghost"}
                                 className={cn(
-                                    "w-full justify-start",
-                                    route.active ? "bg-slate-200/60 text-slate-900" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                                    "w-full justify-start transition-all duration-200",
+                                    route.active
+                                        ? "bg-brand-gold/10 text-brand-gold font-medium border border-brand-gold/20 shadow-[0_0_15px_-5px_rgba(212,175,55,0.3)]"
+                                        : "text-zinc-400 hover:text-white hover:bg-white/5"
                                 )}
                                 asChild
                             >
                                 <Link href={route.href}>
-                                    <route.icon className={cn("mr-2 h-4 w-4", route.active && "text-slate-900")} />
+                                    <route.icon className={cn("mr-2 h-4 w-4", route.active ? "text-brand-gold" : "text-zinc-500 group-hover:text-white")} />
                                     {route.label}
                                 </Link>
                             </Button>
@@ -161,7 +163,7 @@ export function Sidebar({ className }: SidebarProps) {
                 </div>
 
                 <div className="px-3 py-2">
-                    <h2 className="mb-2 px-4 text-xs font-semibold uppercase tracking-tight text-slate-500">
+                    <h2 className="mb-2 px-4 text-xs font-semibold uppercase tracking-tight text-zinc-500">
                         Aide & Outils
                     </h2>
                     <div className="space-y-1">
@@ -171,12 +173,14 @@ export function Sidebar({ className }: SidebarProps) {
                                 variant={route.active ? "secondary" : "ghost"}
                                 className={cn(
                                     "w-full justify-start",
-                                    route.active ? "bg-slate-200/60 text-slate-900" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                                    route.active
+                                        ? "bg-brand-gold/10 text-brand-gold"
+                                        : "text-zinc-400 hover:text-white hover:bg-white/5"
                                 )}
                                 asChild
                             >
                                 <Link href={route.href}>
-                                    <route.icon className={cn("mr-2 h-4 w-4", route.active && "text-slate-900")} />
+                                    <route.icon className={cn("mr-2 h-4 w-4", route.active ? "text-brand-gold" : "text-zinc-500")} />
                                     {route.label}
                                 </Link>
                             </Button>
@@ -185,10 +189,10 @@ export function Sidebar({ className }: SidebarProps) {
                 </div>
             </div>
 
-            <div className="p-4 border-t border-slate-200 bg-white">
+            <div className="p-4 border-t border-white/10 bg-brand-dark/50">
                 <Button
                     variant="ghost"
-                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
                     onClick={handleLogout}
                 >
                     <LogOut className="mr-2 h-4 w-4" />

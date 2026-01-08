@@ -142,24 +142,19 @@ export default function InvoicesPage() {
         }
     }
 
-    if (loading) return <div className="p-8">Chargement...</div>
+    if (loading) return <div className="p-8 text-white">Chargement...</div>
 
     return (
-        <div className="space-y-6 max-w-7xl mx-auto p-2 pb-20">
+        <div className="space-y-6 max-w-7xl mx-auto p-2 pb-20 text-white">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Documents</h1>
-                    <p className="text-slate-500 mt-1">Factures, Devis et Avoirs centralisés.</p>
+                    <h1 className="text-4xl font-heading font-bold tracking-tight text-white">Documents</h1>
+                    <p className="text-zinc-400 mt-1">Factures, Devis et Avoirs centralisés.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => handleBulkExport('xlsx')} className="text-green-700 bg-green-50 border-green-200 hover:bg-green-100">
-                        <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel
-                    </Button>
-                    <Button variant="outline" onClick={() => handleBulkExport('csv')} className="text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100">
-                        <FileText className="mr-2 h-4 w-4" /> CSV
-                    </Button>
-                    <Button asChild className="bg-slate-900 shadow-lg hover:bg-slate-800 rounded-full">
+
+                    <Button asChild className="bg-brand-gold text-brand-dark shadow-lg shadow-brand-gold/20 hover:bg-yellow-500 rounded-full font-bold">
                         <Link href="/dashboard/invoices/new">
                             <Plus className="mr-2 h-4 w-4" /> Créer un document
                         </Link>
@@ -169,35 +164,35 @@ export default function InvoicesPage() {
 
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-white border-slate-100 shadow-sm">
+                <Card className="bg-white/5 border-white/10 shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Factures à payer</CardTitle>
+                        <CardTitle className="text-sm font-medium text-zinc-400">Factures à payer</CardTitle>
                         <FileWarning className="h-4 w-4 text-orange-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-slate-900">
+                        <div className="text-3xl font-bold text-white">
                             {invoices.filter(i => i.status !== 'PAID' && i.type === 'INVOICE').length}
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="bg-white border-slate-100 shadow-sm">
+                <Card className="bg-white/5 border-white/10 shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Devis en cours</CardTitle>
+                        <CardTitle className="text-sm font-medium text-zinc-400">Devis en cours</CardTitle>
                         <FileClock className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-slate-900">
+                        <div className="text-3xl font-bold text-white">
                             {invoices.filter(i => i.type === 'QUOTE').length}
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="bg-white border-slate-100 shadow-sm">
+                <Card className="bg-white/5 border-white/10 shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Avoirs</CardTitle>
+                        <CardTitle className="text-sm font-medium text-zinc-400">Avoirs</CardTitle>
                         <FileText className="h-4 w-4 text-purple-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-slate-900">
+                        <div className="text-3xl font-bold text-white">
                             {invoices.filter(i => i.type === 'CREDIT_NOTE').length}
                         </div>
                     </CardContent>
@@ -207,120 +202,122 @@ export default function InvoicesPage() {
             {/* Main List */}
             <div className="space-y-4">
                 <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                     <Input
                         placeholder="Rechercher par numéro ou client..."
-                        className="pl-10 max-w-sm rounded-full bg-white border-slate-200 focus:ring-slate-900"
+                        className="pl-10 max-w-sm rounded-full bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus:ring-brand-gold focus:border-brand-gold"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <div className="hidden md:block rounded-xl border border-white/10 bg-white/5 shadow-sm overflow-hidden">
                     <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-50 border-b border-slate-100">
+                        <thead className="bg-white/5 border-b border-white/10">
                             <tr>
-                                <th className="h-10 px-6 font-medium text-slate-500">Type & Numéro</th>
-                                <th className="h-10 px-6 font-medium text-slate-500">Client</th>
-                                <th className="h-10 px-6 font-medium text-slate-500">Date</th>
-                                <th className="h-10 px-6 font-medium text-slate-500">Montant TTC</th>
-                                <th className="h-10 px-6 font-medium text-slate-500">Statut</th>
-                                <th className="h-10 px-6 font-medium text-slate-500 text-right">Actions</th>
+                                <th className="h-10 px-6 font-medium text-zinc-400">Type & Numéro</th>
+                                <th className="h-10 px-6 font-medium text-zinc-400">Client</th>
+                                <th className="h-10 px-6 font-medium text-zinc-400">Date</th>
+                                <th className="h-10 px-6 font-medium text-zinc-400">Montant TTC</th>
+                                <th className="h-10 px-6 font-medium text-zinc-400">Statut</th>
+                                <th className="h-10 px-6 font-medium text-zinc-400 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-white/5">
                             {invoices.length === 0 ? (
-                                <td colSpan={6} className="h-96">
-                                    <div className="flex flex-col items-center justify-center text-center h-full text-slate-500">
-                                        <div className="bg-slate-50 p-6 rounded-full mb-4">
-                                            <FileText className="h-12 w-12 text-slate-300" />
+                                <tr>
+                                    <td colSpan={6} className="h-96">
+                                        <div className="flex flex-col items-center justify-center text-center h-full text-zinc-500">
+                                            <div className="bg-white/5 p-6 rounded-full mb-4">
+                                                <FileText className="h-12 w-12 text-zinc-700" />
+                                            </div>
+                                            <h3 className="text-lg font-medium text-white">Aucun document pour le moment</h3>
+                                            <p className="max-w-sm mt-2 text-sm text-zinc-400">
+                                                Commencez par créer votre première facture ou devis pour voir apparaître vos données ici.
+                                            </p>
+                                            <Button asChild className="mt-6 bg-brand-gold hover:bg-yellow-500 text-brand-dark shadow-lg shadow-brand-gold/20 font-bold">
+                                                <Link href="/dashboard/invoices/new">
+                                                    <Plus className="mr-2 h-4 w-4" /> Créer mon premier document
+                                                </Link>
+                                            </Button>
                                         </div>
-                                        <h3 className="text-lg font-medium text-slate-900">Aucun document pour le moment</h3>
-                                        <p className="max-w-sm mt-2 text-sm text-slate-400">
-                                            Commencez par créer votre première facture ou devis pour voir apparaître vos données ici.
-                                        </p>
-                                        <Button asChild className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200">
-                                            <Link href="/dashboard/invoices/new">
-                                                <Plus className="mr-2 h-4 w-4" /> Créer mon premier document
-                                            </Link>
-                                        </Button>
-                                    </div>
-                                </td>
+                                    </td>
+                                </tr>
                             ) : (
                                 filteredInvoices.map((invoice) => (
-                                    <tr key={invoice.id} className="hover:bg-slate-50 transition-colors group">
+                                    <tr key={invoice.id} className="hover:bg-white/5 transition-colors group">
                                         <td className="p-4 align-middle">
                                             <div className="flex items-center gap-3">
                                                 <div className={`h-8 w-8 rounded flex items-center justify-center
-                                                    ${invoice.type === 'QUOTE' ? 'bg-blue-100 text-blue-600' :
-                                                        invoice.type === 'CREDIT_NOTE' ? 'bg-purple-100 text-purple-600' : 'bg-slate-100 text-slate-600'}
+                                                    ${invoice.type === 'QUOTE' ? 'bg-blue-500/20 text-blue-400' :
+                                                        invoice.type === 'CREDIT_NOTE' ? 'bg-purple-500/20 text-purple-400' : 'bg-white/10 text-zinc-400'}
                                                 `}>
                                                     <FileText className="h-4 w-4" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-semibold text-slate-900">{invoice.invoiceNumber || 'BROUILLON'}</span>
-                                                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                                                    <span className="font-semibold text-white">{invoice.invoiceNumber || 'BROUILLON'}</span>
+                                                    <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">
                                                         {invoice.type === 'QUOTE' ? 'DEVIS' : invoice.type === 'CREDIT_NOTE' ? 'AVOIR' : 'FACTURE'}
                                                     </span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="p-4 align-middle font-medium text-slate-700">{invoice.client?.name}</td>
-                                        <td className="p-4 align-middle text-slate-500">{new Date(invoice.issueDate).toLocaleDateString('fr-FR')}</td>
-                                        <td className="p-4 align-middle font-bold text-slate-900">{formatCurrency(invoice.total)}</td>
+                                        <td className="p-4 align-middle font-medium text-zinc-300">{invoice.client?.name}</td>
+                                        <td className="p-4 align-middle text-zinc-500">{new Date(invoice.issueDate).toLocaleDateString('fr-FR')}</td>
+                                        <td className="p-4 align-middle font-bold text-white">{formatCurrency(invoice.total)}</td>
                                         <td className="p-4 align-middle">
                                             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                                                ${invoice.status === 'PAID' ? 'bg-green-100 text-green-800' :
-                                                    invoice.status === 'VALIDATED' ? 'bg-blue-100 text-blue-800' :
-                                                        'bg-slate-100 text-slate-800'}
+                                                ${invoice.status === 'PAID' ? 'bg-green-500/10 text-green-500' :
+                                                    invoice.status === 'VALIDATED' ? 'bg-blue-500/10 text-blue-500' :
+                                                        'bg-white/10 text-zinc-400'}
                                             `}>
                                                 {invoice.status}
                                             </span>
                                         </td>
                                         <td className="p-4 align-middle text-right">
                                             <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" asChild className="hover:text-blue-600">
+                                                <Button variant="ghost" size="icon" asChild className="hover:text-brand-gold hover:bg-white/5 text-zinc-400">
                                                     <Link href={`/dashboard/invoices/${invoice.id}`}>
                                                         <Eye className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
 
                                                 {invoice.status !== 'PAID' && (
-                                                    <Button variant="ghost" size="icon" asChild className="hover:text-slate-900">
+                                                    <Button variant="ghost" size="icon" asChild className="hover:text-white hover:bg-white/5 text-zinc-400">
                                                         <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
                                                             <Pencil className="h-4 w-4" />
                                                         </Link>
                                                     </Button>
                                                 )}
 
-                                                <Button variant="ghost" size="icon" onClick={() => sendEmail(invoice.id, invoice.client?.email)} className="hover:text-indigo-600">
+                                                <Button variant="ghost" size="icon" onClick={() => sendEmail(invoice.id, invoice.client?.email)} className="hover:text-brand-blue hover:bg-white/5 text-zinc-400">
                                                     <Mail className="h-4 w-4" />
                                                 </Button>
 
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="hover:text-slate-900">
+                                                        <Button variant="ghost" size="icon" className="hover:text-white hover:bg-white/5 text-zinc-400">
                                                             <Download className="h-4 w-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'pdf')}>
+                                                    <DropdownMenuContent align="end" className="bg-brand-dark border-white/10 text-zinc-300">
+                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'pdf')} className="hover:bg-white/5 hover:text-white focus:bg-white/5 focus:text-white">
                                                             <FileText className="mr-2 h-4 w-4" /> PDF Standard
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'facturx')} className="text-indigo-600 bg-indigo-50/50">
+                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'facturx')} className="text-brand-blue hover:bg-brand-blue/10 hover:text-brand-blue focus:bg-brand-blue/10 focus:text-brand-blue">
                                                             <FileSpreadsheet className="mr-2 h-4 w-4" /> Factur-X (2026)
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'xml')}>
+                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'xml')} className="hover:bg-white/5 hover:text-white focus:bg-white/5 focus:text-white">
                                                             <FileWarning className="mr-2 h-4 w-4" /> XML Données
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'excel')}>
+                                                        <DropdownMenuItem onClick={() => downloadInvoice(invoice.id, invoice.invoiceNumber, 'excel')} className="hover:bg-white/5 hover:text-white focus:bg-white/5 focus:text-white">
                                                             <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel (Détail)
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
 
                                                 {invoice.status === 'DRAFT' && (
-                                                    <Button variant="ghost" size="icon" onClick={() => deleteInvoice(invoice.id, invoice.invoiceNumber)} className="hover:text-red-600">
+                                                    <Button variant="ghost" size="icon" onClick={() => deleteInvoice(invoice.id, invoice.invoiceNumber)} className="hover:text-red-400 hover:bg-red-500/10 text-zinc-400">
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 )}
@@ -332,6 +329,59 @@ export default function InvoicesPage() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Mobile View */}
+                <div className="md:hidden space-y-4 pb-20">
+                    {filteredInvoices.map((invoice) => (
+                        <Link href={`/dashboard/invoices/${invoice.id}`} key={invoice.id} className="block">
+                            <Card className="bg-white/5 border-white/10 active:scale-[0.98] transition-transform">
+                                <CardContent className="p-4">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center border border-white/5 shadow-inner ${invoice.type === 'QUOTE' ? 'bg-blue-500/20 text-blue-400' :
+                                                invoice.type === 'CREDIT_NOTE' ? 'bg-purple-500/20 text-purple-400' : 'bg-white/10 text-zinc-400'
+                                                }`}>
+                                                <FileText className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-white text-lg">{invoice.invoiceNumber || 'BROUILLON'}</div>
+                                                <div className="text-xs text-zinc-500 font-bold tracking-wider">
+                                                    {invoice.type === 'QUOTE' ? 'DEVIS' : invoice.type === 'CREDIT_NOTE' ? 'AVOIR' : 'FACTURE'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${invoice.status === 'PAID' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+                                            invoice.status === 'VALIDATED' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-white/10 text-zinc-400 border-white/10'
+                                            }`}>
+                                            {invoice.status}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-end border-t border-white/5 pt-4">
+                                        <div>
+                                            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Client</div>
+                                            <div className="font-medium text-white">{invoice.client?.name}</div>
+                                            <div className="text-xs text-zinc-600 mt-1">{new Date(invoice.issueDate).toLocaleDateString('fr-FR')}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Total TTC</div>
+                                            <div className="font-bold text-xl text-brand-gold">{formatCurrency(invoice.total)}</div>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ))}
+                    {filteredInvoices.length === 0 && (
+                        <div className="text-center py-12 text-zinc-500 bg-white/5 rounded-xl border border-white/10">
+                            <p>Aucun document trouvé.</p>
+                            <Button asChild className="mt-4 bg-brand-gold text-brand-dark font-bold">
+                                <Link href="/dashboard/invoices/new">Créer</Link>
+                            </Button>
+                        </div>
+                    )}
+                </div>
+
+
             </div>
         </div>
     )

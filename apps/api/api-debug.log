@@ -2452,3 +2452,258 @@
 [2026-01-07T23:44:39.028Z] FindAll Clients Result {
   "count": 1
 }
+[2026-01-07T23:55:34.225Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-07T23:55:34.252Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-07T23:55:34.257Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-07T23:55:34.281Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:30:35.759Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:30:35.793Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:30:35.807Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:30:35.841Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:31:02.481Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:31:02.517Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:31:02.526Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:31:02.565Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:33:18.383Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:33:18.416Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:33:18.422Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:33:18.470Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:34:18.608Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:34:18.642Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:34:18.647Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:34:18.673Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:34:39.452Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:34:39.475Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:34:39.480Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:34:39.506Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:37:40.888Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:37:40.915Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:37:40.922Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:37:40.946Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:13.538Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:13.570Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:13.624Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:13.655Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:17.887Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:17.911Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:17.917Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:17.945Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:28.355Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:28.391Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:28.402Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:28.433Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:37.717Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:37.746Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:37.790Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:37.819Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:40.884Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:40.915Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:38:40.922Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:38:40.947Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:39:35.013Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:39:35.050Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:39:35.067Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:39:35.113Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:39:39.331Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:39:39.390Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:39:39.400Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:39:39.433Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:40:09.455Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:40:09.486Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:40:09.497Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:40:09.529Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:42:14.724Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:42:14.763Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:42:14.779Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:42:14.812Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:42:37.167Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:42:37.198Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:42:37.211Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:42:37.245Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:42:41.986Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:42:42.028Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:42:42.044Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:42:42.077Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:44:18.533Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:44:18.563Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T01:44:18.571Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T01:44:18.598Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T02:02:09.439Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T02:02:34.794Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T02:02:34.945Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T02:02:34.952Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T02:02:34.980Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T02:04:17.950Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T02:04:18.023Z] FindAll Clients Result {
+  "count": 1
+}
+[2026-01-08T02:04:18.030Z] Received FindAll Clients Request {
+  "userId": "695b0cd78cff34f12764d2b6"
+}
+[2026-01-08T02:04:18.053Z] FindAll Clients Result {
+  "count": 1
+}

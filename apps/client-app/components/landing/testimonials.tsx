@@ -33,9 +33,9 @@ const testimonials = [
 
 export function Testimonials() {
     return (
-        <section id="testimonials" className="relative py-24 bg-black overflow-hidden">
+        <section id="testimonials" className="relative py-24 bg-brand-dark overflow-hidden">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-950/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-blue/5 to-transparent" />
 
             <div className="container mx-auto px-4 relative z-10">
                 {/* Section Header */}
@@ -46,7 +46,7 @@ export function Testimonials() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                    <h2 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
                         Ils nous font confiance
                     </h2>
                     <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
@@ -65,11 +65,11 @@ export function Testimonials() {
                             transition={{ duration: 0.6, delay: index * 0.1 }}
                             className="group"
                         >
-                            <div className="relative h-full p-8 rounded-2xl bg-zinc-900/50 border border-white/10 backdrop-blur-sm hover:border-purple-500/30 transition-all duration-300 hover:shadow-[0_0_30px_-5px_rgba(168,85,247,0.3)]">
+                            <div className="relative h-full p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
                                 {/* Stars */}
                                 <div className="flex gap-1 mb-4">
                                     {[...Array(testimonial.rating)].map((_, i) => (
-                                        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                                        <Star key={i} className="w-5 h-5 fill-brand-gold text-brand-gold" />
                                     ))}
                                 </div>
 
@@ -80,8 +80,9 @@ export function Testimonials() {
 
                                 {/* Author */}
                                 <div className="flex items-center gap-4 mt-auto">
-                                    <div className="relative w-12 h-12 rounded-full overflow-hidden ring-2 ring-purple-500/20">
-                                        <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500" />
+                                    <div className="relative w-12 h-12 rounded-full overflow-hidden ring-2 ring-brand-gold/20 bg-zinc-800">
+                                        {/* Placeholder for user image if needed, or gradient */}
+                                        <div className="w-full h-full bg-gradient-to-br from-brand-blue to-purple-600 opacity-50" />
                                     </div>
                                     <div>
                                         <div className="font-semibold text-white">{testimonial.name}</div>
@@ -105,7 +106,7 @@ export function Testimonials() {
                     <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
                         <div className="flex -space-x-2">
                             {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 ring-2 ring-black" />
+                                <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-gold to-yellow-600 ring-2 ring-brand-dark" />
                             ))}
                         </div>
                         <span className="text-zinc-300 text-sm">

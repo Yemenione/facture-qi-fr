@@ -16,23 +16,23 @@ export function VatSummary({ data }: VatSummaryProps) {
     const activeData = data.filter(d => d.revenue > 0 || d.vat > 0);
 
     return (
-        <Card className="h-full">
+        <Card className="h-full bg-white/5 border-white/10 shadow-sm">
             <CardHeader>
-                <CardTitle>Synthèse TVA</CardTitle>
-                <CardDescription>TVA collectée par mois (CA3).</CardDescription>
+                <CardTitle className="text-zinc-200">Synthèse TVA</CardTitle>
+                <CardDescription className="text-zinc-400">TVA collectée par mois (CA3).</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
                     {activeData.length === 0 ? (
-                        <p className="text-sm text-center text-muted-foreground py-8">Aucune donnée pour cette période.</p>
+                        <p className="text-sm text-center text-zinc-500 py-8">Aucune donnée pour cette période.</p>
                     ) : (
                         <div className="space-y-2">
                             {activeData.map((d) => (
-                                <div key={d.month} className="flex items-center justify-between text-sm border-b pb-2 last:border-0">
-                                    <span className="font-medium text-slate-700">{MONTHS[d.month - 1]}</span>
+                                <div key={d.month} className="flex items-center justify-between text-sm border-b border-white/5 pb-2 last:border-0 hover:bg-white/5 p-2 rounded transition-colors">
+                                    <span className="font-medium text-zinc-200">{MONTHS[d.month - 1]}</span>
                                     <div className="text-right">
-                                        <div className="font-bold">{formatCurrency(d.vat)}</div>
-                                        <div className="text-xs text-muted-foreground">Base HT: {formatCurrency(d.revenue)}</div>
+                                        <div className="font-bold text-white">{formatCurrency(d.vat)}</div>
+                                        <div className="text-xs text-zinc-500">Base HT: {formatCurrency(d.revenue)}</div>
                                     </div>
                                 </div>
                             ))}

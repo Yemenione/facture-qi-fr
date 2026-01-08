@@ -32,9 +32,9 @@ const stats = [
 
 export function Stats() {
     return (
-        <section className="relative py-20 bg-black overflow-hidden">
+        <section className="relative py-20 bg-brand-dark overflow-hidden border-b border-white/5">
             {/* Background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-zinc-900/50 to-black" />
+            <div className="absolute inset-0 bg-gradient-to-b from-zinc-900/50 to-brand-dark" />
 
             <div className="container mx-auto px-4 relative z-10">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
@@ -47,10 +47,10 @@ export function Stats() {
                             transition={{ duration: 0.5, delay: index * 0.1 }}
                             className="text-center group"
                         >
-                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600/20 to-pink-600/20 border border-purple-500/30 mb-4 group-hover:scale-110 transition-transform duration-300">
-                                <stat.icon className="w-8 h-8 text-purple-400" />
+                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-gold/10 border border-brand-gold/20 mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <stat.icon className="w-8 h-8 text-brand-gold" />
                             </div>
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                            <div className="text-4xl md:text-5xl font-heading font-bold text-white mb-2 bg-gradient-to-r from-brand-gold to-yellow-200 bg-clip-text text-transparent">
                                 {stat.value}
                             </div>
                             <div className="text-lg font-semibold text-zinc-300 mb-1">

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { authService } from "@/services/auth.service"
-import { LogOut, LayoutDashboard, Menu, X, ChevronRight } from "lucide-react"
+import { LogOut, LayoutDashboard, Menu, X, ChevronRight, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 
@@ -39,42 +39,40 @@ export function Navbar() {
             <div className={cn(
                 "flex items-center justify-between rounded-full border border-white/10 px-6 py-3 transition-all duration-300",
                 scrolled
-                    ? "bg-black/60 backdrop-blur-md shadow-2xl ring-1 ring-white/10"
+                    ? "bg-brand-dark/80 backdrop-blur-md shadow-2xl ring-1 ring-white/10"
                     : "bg-transparent"
             )}>
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group">
-                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:shadow-indigo-500/50 transition-all duration-300">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-gold to-yellow-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:shadow-brand-gold/20 transition-all duration-300">
                         I
                     </div>
-                    <span className="font-bold text-lg tracking-tight text-white group-hover:text-indigo-400 transition-colors">
+                    <span className="font-heading font-bold text-lg tracking-tight text-white group-hover:text-brand-gold transition-colors">
                         Invoicer FR
                     </span>
                 </Link>
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link
-                        href="#features"
-                        className="text-sm font-medium text-zinc-400 hover:text-white transition-colors relative group"
-                    >
-                        Fonctionnalités
-                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 transition-all group-hover:w-full" />
-                    </Link>
-                    <Link
-                        href="#pricing"
-                        className="text-sm font-medium text-zinc-400 hover:text-white transition-colors relative group"
-                    >
-                        Tarifs
-                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 transition-all group-hover:w-full" />
-                    </Link>
-                    <Link
-                        href="#testimonials"
-                        className="text-sm font-medium text-zinc-400 hover:text-white transition-colors relative group"
-                    >
-                        Témoignages
-                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-500 transition-all group-hover:w-full" />
-                    </Link>
+                    {/* Solutions Dropdown */}
+                    <div className="relative group">
+                        <button className="flex items-center gap-1 text-sm font-medium text-zinc-400 group-hover:text-white transition-colors py-2">
+                            Solutions <ChevronDown className="w-3 h-3 group-hover:rotate-180 transition-transform" />
+                        </button>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 p-1">
+                            <div className="bg-brand-dark border border-white/10 rounded-xl shadow-xl overflow-hidden p-1">
+                                <Link href="/solutions/freelances" className="block px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                    Pour Freelances
+                                </Link>
+                                <Link href="/solutions/pme" className="block px-4 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                    Pour PME
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Link href="/docs" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Documentation</Link>
+                    <Link href="/#pricing" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Tarifs</Link>
                 </nav>
 
                 {/* Actions */}
@@ -102,7 +100,7 @@ export function Navbar() {
                                 Connexion
                             </Link>
                             <Link href="/register">
-                                <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6 shadow-lg shadow-indigo-500/20 group">
+                                <Button size="sm" className="bg-brand-gold hover:bg-yellow-500 text-brand-dark font-bold rounded-full px-6 shadow-lg shadow-brand-gold/20 group">
                                     Commencer
                                     <ChevronRight className="h-3 w-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
                                 </Button>
@@ -127,45 +125,45 @@ export function Navbar() {
                         initial={{ opacity: 0, y: -20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        className="absolute top-20 left-4 right-4 bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl overflow-hidden"
+                        className="absolute top-20 left-4 right-4 bg-brand-dark/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl overflow-hidden"
                     >
                         <div className="flex flex-col space-y-4">
+                            <div className="space-y-2 pb-2 border-b border-white/5">
+                                <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-2">Solutions</p>
+                                <Link href="/solutions/freelances" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1 text-zinc-300 hover:text-white">Freelances</Link>
+                                <Link href="/solutions/pme" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1 text-zinc-300 hover:text-white">PME & TPE</Link>
+                            </div>
+
                             <Link
-                                href="#features"
+                                href="/docs"
                                 onClick={() => setMobileMenuOpen(false)}
                                 className="text-lg font-medium text-zinc-300 hover:text-white p-2 hover:bg-white/5 rounded-lg transition-colors"
                             >
-                                Fonctionnalités
+                                Documentation
                             </Link>
                             <Link
-                                href="#pricing"
+                                href="/#pricing"
                                 onClick={() => setMobileMenuOpen(false)}
                                 className="text-lg font-medium text-zinc-300 hover:text-white p-2 hover:bg-white/5 rounded-lg transition-colors"
                             >
                                 Tarifs
                             </Link>
-                            <Link
-                                href="#testimonials"
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="text-lg font-medium text-zinc-300 hover:text-white p-2 hover:bg-white/5 rounded-lg transition-colors"
-                            >
-                                Témoignages
-                            </Link>
+
                             <div className="h-px bg-white/10 my-2" />
                             {isLoggedIn ? (
                                 <>
                                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                                        <Button className="w-full bg-indigo-600">Dashboard</Button>
+                                        <Button className="w-full bg-brand-blue">Dashboard</Button>
                                     </Link>
                                     <Button variant="ghost" className="w-full text-red-400" onClick={handleLogout}>Déconnexion</Button>
                                 </>
                             ) : (
                                 <>
                                     <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                                        <Button variant="outline" className="w-full border-white/10 text-zinc-800 hover:bg-white/5 hover:text-white">Connexion</Button>
+                                        <Button variant="outline" className="w-full border-white/10 text-zinc-300 hover:bg-white/5 hover:text-white">Connexion</Button>
                                     </Link>
                                     <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                                        <Button className="w-full bg-indigo-600">S'inscrire</Button>
+                                        <Button className="w-full bg-brand-gold text-brand-dark font-bold">S'inscrire</Button>
                                     </Link>
                                 </>
                             )}

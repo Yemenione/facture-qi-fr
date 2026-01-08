@@ -23,18 +23,18 @@ export default function ExpertModeBanner() {
     };
 
     return (
-        <div className="bg-indigo-900 text-white px-4 py-2 flex items-center justify-between shadow-md relative z-50">
+        <div className="bg-brand-blue text-white px-4 py-2 flex items-center justify-between shadow-md relative z-50 border-b border-white/10">
             <div className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-green-400" />
-                <span className="font-medium text-sm">
-                    Mode Expert Activé : Vous accédez à ce dossier en tant que collaborateur comptable.
+                <ShieldCheck className="h-5 w-5 text-brand-gold" />
+                <span className="font-heading font-medium text-sm tracking-wide">
+                    Mode Expert Activé : Accès collaborateur comptable.
                 </span>
             </div>
             <Button
                 onClick={handleExit}
                 variant="secondary"
                 size="sm"
-                className="bg-white text-indigo-900 hover:bg-indigo-50 border-0 h-8 text-xs font-semibold gap-2"
+                className="bg-brand-gold text-brand-dark hover:bg-yellow-500 border-0 h-8 text-xs font-bold gap-2 shadow-sm"
             >
                 <LogOut className="h-3 w-3" /> Quitter le mode expert
             </Button>

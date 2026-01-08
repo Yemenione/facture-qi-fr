@@ -55,10 +55,10 @@ export default function ProductsPage() {
         <div className="space-y-6 max-w-7xl mx-auto p-4 pb-20">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Catalogue Produits</h1>
-                    <p className="text-muted-foreground">Gérez vos articles et services récurrents.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-white">Catalogue Produits</h1>
+                    <p className="text-zinc-400">Gérez vos articles et services récurrents.</p>
                 </div>
-                <Button asChild className="bg-slate-900 rounded-full">
+                <Button asChild className="bg-brand-gold text-brand-dark font-bold rounded-full shadow-lg shadow-brand-gold/20 hover:bg-yellow-500">
                     <Link href="/dashboard/products/new">
                         <Plus className="mr-2 h-4 w-4" /> Nouveau Produit
                     </Link>
@@ -67,21 +67,21 @@ export default function ProductsPage() {
 
             {/* Stats Cards (Mini Bento) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-gradient-to-br from-blue-50 to-white border-blue-100 shadow-sm">
+                <Card className="bg-white/5 border-white/10 shadow-sm">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-blue-600">Total Articles</CardTitle>
+                        <CardTitle className="text-sm font-medium text-blue-400">Total Articles</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{products.length}</div>
+                        <div className="text-2xl font-bold text-white">{products.length}</div>
                     </CardContent>
                 </Card>
                 {/* Placeholders for future stats */}
-                <Card className="bg-white border-slate-100 shadow-sm">
+                <Card className="bg-white/5 border-white/10 shadow-sm">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Prix Moyen</CardTitle>
+                        <CardTitle className="text-sm font-medium text-zinc-400">Prix Moyen</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
+                        <div className="text-2xl font-bold text-white">
                             {products.length > 0 ? formatCurrency(products.reduce((acc, p) => acc + p.price, 0) / products.length) : '0 €'}
                         </div>
                     </CardContent>
@@ -91,18 +91,18 @@ export default function ProductsPage() {
             {/* List with Search */}
             <div className="space-y-4">
                 <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                     <Input
                         placeholder="Rechercher un produit..."
-                        className="pl-10 max-w-sm rounded-full bg-white"
+                        className="pl-10 max-w-sm rounded-full bg-white/5 border-white/10 text-white placeholder:text-zinc-500"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+                <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                        <thead className="bg-white/5 text-zinc-400 uppercase text-xs font-semibold border-b border-white/10">
                             <tr>
                                 <th className="px-6 py-4">Nom</th>
                                 <th className="px-6 py-4">Prix Unitaire</th>
@@ -110,43 +110,43 @@ export default function ProductsPage() {
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-white/10">
                             {filteredProducts.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
+                                    <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
                                         Aucun produit trouvé. Créez-en un nouveau !
                                     </td>
                                 </tr>
                             ) : (
                                 filteredProducts.map((product) => (
-                                    <tr key={product.id} className="hover:bg-slate-50 transition-colors">
-                                        <td className="px-6 py-4 font-medium text-slate-900">
+                                    <tr key={product.id} className="hover:bg-white/5 transition-colors">
+                                        <td className="px-6 py-4 font-medium text-white">
                                             <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded bg-slate-100 flex items-center justify-center text-slate-500">
+                                                <div className="h-8 w-8 rounded bg-white/10 flex items-center justify-center text-zinc-400">
                                                     <Tag className="h-4 w-4" />
                                                 </div>
                                                 <div>
                                                     <div>{product.name}</div>
-                                                    <div className="text-xs text-slate-400 font-normal truncate max-w-[200px]">{product.description}</div>
+                                                    <div className="text-xs text-zinc-500 font-normal truncate max-w-[200px]">{product.description}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 font-medium text-slate-700">
+                                        <td className="px-6 py-4 font-medium text-zinc-200">
                                             {formatCurrency(product.price)}
-                                            <span className="text-xs text-muted-foreground font-normal ml-1">/ {product.unit}</span>
+                                            <span className="text-xs text-zinc-500 font-normal ml-1">/ {product.unit}</span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                                            <span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium text-zinc-300">
                                                 {product.vatRate}%
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <Button variant="ghost" size="icon" asChild>
+                                            <Button variant="ghost" size="icon" asChild className="hover:bg-white/5 hover:text-white text-zinc-400">
                                                 <Link href={`/dashboard/products/${product.id}`}>
-                                                    <Pencil className="h-4 w-4 text-slate-500" />
+                                                    <Pencil className="h-4 w-4" />
                                                 </Link>
                                             </Button>
-                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)} className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)} className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
                                                 <Trash className="h-4 w-4" />
                                             </Button>
                                         </td>

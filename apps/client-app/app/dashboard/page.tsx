@@ -65,15 +65,15 @@ export default function DashboardPage() {
         return (
             <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
                 <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-slate-500" />
-                    <p className="text-sm text-slate-400">Chargement de votre tableau de bord...</p>
+                    <Loader2 className="h-8 w-8 animate-spin text-brand-gold" />
+                    <p className="text-sm text-zinc-400">Chargement de votre tableau de bord...</p>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="space-y-8 p-2 pb-20 max-w-7xl mx-auto">
+        <div className="space-y-8 p-2 pb-20 max-w-7xl mx-auto text-white">
             {/* Header Section */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -81,17 +81,17 @@ export default function DashboardPage() {
                 className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
             >
                 <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+                    <h1 className="text-3xl font-heading font-bold tracking-tight text-white">
                         {getGreeting()}, {user?.firstName || 'Entrepreneur'} 👋
                     </h1>
-                    <p className="text-slate-500 mt-1">Voici ce qui se passe dans votre entreprise aujourd'hui.</p>
+                    <p className="text-zinc-400 mt-1">Voici ce qui se passe dans votre entreprise aujourd'hui.</p>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline" className="hidden md:flex">
+                    <Button variant="outline" className="hidden md:flex border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white">
                         <Calendar className="mr-2 h-4 w-4" />
                         {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                     </Button>
-                    <Button asChild className="bg-slate-900 hover:bg-slate-800 shadow-lg shadow-slate-900/20 rounded-full px-6 transition-all hover:scale-105">
+                    <Button asChild className="bg-brand-gold hover:bg-yellow-500 text-brand-dark shadow-lg shadow-brand-gold/20 rounded-full px-6 transition-all hover:scale-105 font-bold">
                         <Link href="/dashboard/invoices/new">
                             <Plus className="mr-2 h-4 w-4" /> Nouvelle Facture
                         </Link>
@@ -102,20 +102,20 @@ export default function DashboardPage() {
             <BentoGrid className="max-w-full md:auto-rows-[22rem]">
                 {/* 1. Main Revenue Card (Large) */}
                 <BentoGridItem
-                    className="md:col-span-2 bg-gradient-to-br from-white to-slate-50 border-slate-100 shadow-sm"
+                    className="md:col-span-2 bg-gradient-to-br from-brand-blue/10 to-brand-dark border-white/10 shadow-sm"
                     header={
                         <div className="flex flex-col h-full justify-between p-2">
                             <div className="flex justify-between items-start">
-                                <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
-                                    <Wallet className="w-6 h-6 text-slate-900" />
+                                <div className="p-3 bg-white/5 rounded-2xl shadow-sm border border-white/10">
+                                    <Wallet className="w-6 h-6 text-brand-gold" />
                                 </div>
-                                <span className="flex items-center text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                                <span className="flex items-center text-sm font-medium text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
                                     <ArrowUpRight className="w-4 h-4 mr-1" /> +12.5%
                                 </span>
                             </div>
                             <div className="mt-4">
-                                <p className="text-sm font-medium text-slate-500">Chiffre d'Affaires</p>
-                                <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight mt-1">
+                                <p className="text-sm font-medium text-zinc-400">Chiffre d'Affaires</p>
+                                <h2 className="text-4xl sm:text-5xl font-heading font-bold text-white tracking-tight mt-1">
                                     {formatCurrency(stats?.totalRevenue || 0)}
                                 </h2>
                             </div>
@@ -124,24 +124,25 @@ export default function DashboardPage() {
                                     <AreaChart data={chartData}>
                                         <defs>
                                             <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#0f172a" stopOpacity={0.1} />
-                                                <stop offset="95%" stopColor="#0f172a" stopOpacity={0} />
+                                                <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
                                         <Tooltip
                                             contentStyle={{
+                                                backgroundColor: '#1e1b4b',
+                                                borderColor: 'rgba(255,255,255,0.1)',
                                                 borderRadius: '12px',
-                                                border: 'none',
-                                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                                fontFamily: 'inherit'
+                                                color: 'white'
                                             }}
+                                            itemStyle={{ color: '#D4AF37' }}
                                             formatter={(value: number) => [`${value} €`, 'Revenus']}
-                                            cursor={{ stroke: '#cbd5e1', strokeDasharray: '4 4' }}
+                                            cursor={{ stroke: '#ffffff30', strokeDasharray: '4 4' }}
                                         />
                                         <Area
                                             type="monotone"
                                             dataKey="val"
-                                            stroke="#0f172a"
+                                            stroke="#D4AF37"
                                             strokeWidth={3}
                                             fillOpacity={1}
                                             fill="url(#colorVal)"
@@ -158,16 +159,16 @@ export default function DashboardPage() {
                     {/* Pending Revenue */}
                     <motion.div
                         whileHover={{ y: -5 }}
-                        className="bg-orange-50/50 border border-orange-100 rounded-xl p-6 flex flex-col justify-between"
+                        className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col justify-between"
                     >
                         <div className="flex justify-between items-start">
-                            <div className="p-2 bg-white rounded-lg shadow-sm text-orange-600">
+                            <div className="p-2 bg-orange-500/10 rounded-lg shadow-sm text-orange-500">
                                 <TrendingUp className="w-5 h-5" />
                             </div>
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-orange-600/80">En Attente</p>
-                            <h3 className="text-2xl font-bold text-slate-900 mt-1">
+                            <p className="text-sm font-medium text-zinc-400">En Attente</p>
+                            <h3 className="text-2xl font-bold text-white mt-1">
                                 {formatCurrency(stats?.pendingRevenue || 0)}
                             </h3>
                         </div>
@@ -176,16 +177,16 @@ export default function DashboardPage() {
                     {/* Clients Count */}
                     <motion.div
                         whileHover={{ y: -5 }}
-                        className="bg-blue-50/50 border border-blue-100 rounded-xl p-6 flex flex-col justify-between"
+                        className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col justify-between"
                     >
                         <div className="flex justify-between items-start">
-                            <div className="p-2 bg-white rounded-lg shadow-sm text-blue-600">
+                            <div className="p-2 bg-blue-500/10 rounded-lg shadow-sm text-brand-blue">
                                 <Users className="w-5 h-5" />
                             </div>
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-blue-600/80">Clients Actifs</p>
-                            <h3 className="text-2xl font-bold text-slate-900 mt-1">
+                            <p className="text-sm font-medium text-zinc-400">Clients Actifs</p>
+                            <h3 className="text-2xl font-bold text-white mt-1">
                                 {stats?.clientsCount || 0}
                             </h3>
                         </div>
@@ -194,17 +195,17 @@ export default function DashboardPage() {
 
                 {/* 3. Recent Invoices (Large List) */}
                 <BentoGridItem
-                    className="md:col-span-3 bg-white border-slate-100 shadow-sm"
+                    className="md:col-span-3 bg-white/5 border-white/10 shadow-sm"
                     header={
                         <div className="flex flex-col h-full">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2">
-                                    <div className="p-2 bg-slate-50 rounded-lg">
-                                        <Activity className="w-5 h-5 text-slate-600" />
+                                    <div className="p-2 bg-white/10 rounded-lg">
+                                        <Activity className="w-5 h-5 text-zinc-400" />
                                     </div>
-                                    <h3 className="font-semibold text-slate-900">Activité Récente</h3>
+                                    <h3 className="font-semibold text-white">Activité Récente</h3>
                                 </div>
-                                <Button variant="ghost" size="sm" asChild className="text-slate-500 hover:text-slate-900">
+                                <Button variant="ghost" size="sm" asChild className="text-zinc-400 hover:text-white hover:bg-white/5">
                                     <Link href="/dashboard/invoices">
                                         Voir tout <ChevronRight className="ml-1 h-4 w-4" />
                                     </Link>
@@ -213,7 +214,7 @@ export default function DashboardPage() {
 
                             <div className="flex flex-col gap-2 overflow-y-auto pr-2 max-h-[300px]">
                                 {stats?.recentInvoices?.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center p-8 text-slate-400 border-2 border-dashed border-slate-100 rounded-lg">
+                                    <div className="flex flex-col items-center justify-center p-8 text-zinc-500 border-2 border-dashed border-white/10 rounded-lg">
                                         <FileText className="w-8 h-8 mb-2 opacity-50" />
                                         <p>Aucune facture récente</p>
                                     </div>
@@ -223,26 +224,26 @@ export default function DashboardPage() {
                                         const isPending = invoice.status === 'SENT' || invoice.status === 'VALIDATED'
 
                                         return (
-                                            <div key={idx} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-lg transition-colors group cursor-pointer border border-transparent hover:border-slate-100">
+                                            <div key={idx} className="flex items-center justify-between p-3 hover:bg-white/5 rounded-lg transition-colors group cursor-pointer border border-transparent hover:border-white/5">
                                                 <div className="flex items-center gap-4">
-                                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${isPaid ? 'bg-emerald-100 text-emerald-600' :
-                                                            isPending ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-600'
+                                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${isPaid ? 'bg-emerald-500/10 text-emerald-500' :
+                                                        isPending ? 'bg-orange-500/10 text-orange-500' : 'bg-white/10 text-zinc-400'
                                                         }`}>
                                                         <FileText className="w-5 h-5" />
                                                     </div>
                                                     <div>
-                                                        <div className="font-semibold text-slate-900">{invoice.client?.name || 'Client Inconnu'}</div>
-                                                        <div className="text-xs text-slate-500 flex items-center gap-2">
+                                                        <div className="font-semibold text-white">{invoice.client?.name || 'Client Inconnu'}</div>
+                                                        <div className="text-xs text-zinc-500 flex items-center gap-2">
                                                             {invoice.invoiceNumber}
-                                                            <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                                            <span className="w-1 h-1 bg-zinc-600 rounded-full"></span>
                                                             {new Date(invoice.issueDate).toLocaleDateString('fr-FR')}
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="font-bold text-slate-900">{formatCurrency(invoice.total)}</div>
-                                                    <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block mt-1 ${isPaid ? 'bg-emerald-50 text-emerald-700' :
-                                                            isPending ? 'bg-orange-50 text-orange-700' : 'bg-slate-100 text-slate-700'
+                                                    <div className="font-bold text-white">{formatCurrency(invoice.total)}</div>
+                                                    <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block mt-1 ${isPaid ? 'bg-emerald-500/10 text-emerald-500' :
+                                                        isPending ? 'bg-orange-500/10 text-orange-500' : 'bg-white/10 text-zinc-400'
                                                         }`}>
                                                         {isPaid ? 'Payée' : isPending ? 'En attente' : invoice.status}
                                                     </div>

@@ -7,10 +7,10 @@ import { ArrowRight, Sparkles } from "lucide-react"
 
 export function FinalCTA() {
     return (
-        <section className="relative py-24 bg-black overflow-hidden">
+        <section className="relative py-24 bg-brand-dark overflow-hidden">
             {/* Background Effects */}
             <div className="absolute inset-0">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-indigo-600/20 rounded-full blur-[150px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-gradient-to-r from-brand-blue/20 via-brand-gold/10 to-transparent rounded-full blur-[150px]" />
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
             </div>
 
@@ -24,14 +24,14 @@ export function FinalCTA() {
                 >
                     {/* Badge */}
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-8">
-                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        <Sparkles className="w-4 h-4 text-brand-gold" />
                         <span className="text-sm text-zinc-300">Essai gratuit de 14 jours • Sans carte bancaire</span>
                     </div>
 
                     {/* Heading */}
-                    <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+                    <h2 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6 leading-tight">
                         Prêt à simplifier votre{" "}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold via-yellow-200 to-brand-gold">
                             facturation ?
                         </span>
                     </h2>
@@ -45,7 +45,7 @@ export function FinalCTA() {
                         <Link href="/register">
                             <Button
                                 size="lg"
-                                className="h-14 px-8 text-lg rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-[0_0_40px_-10px_rgba(168,85,247,0.5)] hover:shadow-[0_0_50px_-5px_rgba(168,85,247,0.7)] transition-all hover:scale-105"
+                                className="h-14 px-8 text-lg rounded-full bg-brand-gold text-brand-dark hover:bg-yellow-400 font-bold transition-all hover:scale-105 shadow-[0_0_40px_-10px_rgba(212,175,55,0.3)]"
                             >
                                 Commencer gratuitement
                                 <ArrowRight className="ml-2 h-5 w-5" />

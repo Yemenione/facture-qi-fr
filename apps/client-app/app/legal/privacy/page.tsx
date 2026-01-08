@@ -1,23 +1,31 @@
+"use client";
+
+import { Navbar } from "@/components/landing/navbar";
+import { Footer } from "@/components/landing/footer";
 
 export default function PrivacyPage() {
     return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-bold text-slate-900">Politique de Confidentialité</h1>
+        <main className="min-h-screen bg-brand-dark selection:bg-brand-gold/30 text-white">
+            <Navbar />
+            <div className="container mx-auto px-4 py-32 max-w-4xl">
+                <h1 className="text-4xl font-heading font-bold mb-8">Politique de Confidentialité</h1>
+                <div className="prose prose-invert max-w-none text-zinc-300 space-y-6">
+                    <p className="text-sm text-zinc-500">Dernière mise à jour : 01 Janvier 2026</p>
 
-            <section>
-                <h2 className="text-xl font-semibold mb-2">1. Collecte des données</h2>
-                <p>Nous collectons les données nécessaires au bon fonctionnement du service (email, nom, données de facturation).</p>
-            </section>
+                    <h2 className="text-2xl font-bold text-white">1. Collecte des données</h2>
+                    <p>Nous collectons les données nécessaires à l'établissement de vos factures et à la gestion de votre compte (Nom, SIRET, Email, Coordonnées bancaires).</p>
 
-            <section>
-                <h2 className="text-xl font-semibold mb-2">2. Utilisation</h2>
-                <p>Vos données ne sont jamais vendues à des tiers.</p>
-            </section>
+                    <h2 className="text-2xl font-bold text-white">2. Utilisation</h2>
+                    <p>Vos données ne sont jamais revendues. Elles sont utilisées exclusivement pour le service de facturation et les obligations légales.</p>
 
-            <section>
-                <h2 className="text-xl font-semibold mb-2">3. Vos droits</h2>
-                <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données.</p>
-            </section>
-        </div>
-    )
+                    <h2 className="text-2xl font-bold text-white">3. Sécurité</h2>
+                    <p>Toutes les données sont chiffrées (AES-256) et hébergées sur des serveurs sécurisés en France.</p>
+
+                    <h2 className="text-2xl font-bold text-white">4. Cookies</h2>
+                    <p>Nous utilisons uniquement des cookies techniques essentiels au fonctionnement de l'application.</p>
+                </div>
+            </div>
+            <Footer />
+        </main>
+    );
 }

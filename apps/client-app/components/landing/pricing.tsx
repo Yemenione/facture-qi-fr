@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Check, ArrowRight, Sparkles } from "lucide-react"
 import { useEffect, useState } from "react"
 
-// Fallback plans if API fails
 const defaultPlans = [
     {
         id: "free",
@@ -48,7 +47,6 @@ export function Pricing() {
                 if (res.ok) {
                     const data = await res.json()
                     if (data.length > 0) {
-                        // Map DB plans to UI structure
                         const mappedPlans = data.map((plan: any) => ({
                             ...plan,
                             features: plan.code === 'FREE' ?
@@ -70,10 +68,10 @@ export function Pricing() {
     }, [])
 
     return (
-        <section id="pricing" className="relative py-24 bg-black overflow-hidden">
+        <section id="pricing" className="relative py-24 bg-brand-dark overflow-hidden">
             {/* Background Effects */}
             <div className="absolute inset-0">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[150px]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-blue/10 rounded-full blur-[150px]" />
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
@@ -85,11 +83,11 @@ export function Pricing() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                    <h2 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
                         Tarifs simples et transparents
                     </h2>
                     <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-                        Choisissez le plan qui correspond à vos besoins. Sans engagement, résiliable à tout moment.
+                        Choisissez le plan qui correspond à vos besoins. Sans engagement.
                     </p>
                 </motion.div>
 
@@ -112,16 +110,16 @@ export function Pricing() {
                                 {/* Popular Badge */}
                                 {isPopular && (
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                                        <div className="flex items-center gap-1 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold shadow-lg">
+                                        <div className="flex items-center gap-1 px-4 py-1.5 rounded-full bg-brand-gold text-brand-dark text-sm font-bold shadow-lg">
                                             <Sparkles className="w-4 h-4" />
-                                            Plus populaire
+                                            Recommandé
                                         </div>
                                     </div>
                                 )}
 
                                 <div className={`relative h-full p-8 rounded-2xl backdrop-blur-sm transition-all duration-300 ${isPopular
-                                    ? 'bg-gradient-to-b from-purple-900/30 to-zinc-900/50 border-2 border-purple-500/50 shadow-[0_0_50px_-10px_rgba(168,85,247,0.5)]'
-                                    : 'bg-zinc-900/50 border border-white/10 hover:border-purple-500/30'
+                                    ? 'bg-gradient-to-b from-brand-blue/20 to-zinc-900/50 border-2 border-brand-gold/50 shadow-[0_0_50px_-10px_rgba(212,175,55,0.2)]'
+                                    : 'bg-zinc-900/50 border border-white/10 hover:border-brand-blue/30'
                                     }`}>
                                     {/* Plan Name */}
                                     <div className="mb-6">
@@ -146,7 +144,7 @@ export function Pricing() {
                                     <ul className="space-y-4 mb-8">
                                         {plan.features && Array.isArray(plan.features) && plan.features.map((feature: string, i: number) => (
                                             <li key={i} className="flex items-start gap-3">
-                                                <Check className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                                                <Check className="w-5 h-5 text-brand-blue flex-shrink-0 mt-0.5" />
                                                 <span className="text-zinc-300 text-sm">{feature}</span>
                                             </li>
                                         ))}
@@ -155,8 +153,8 @@ export function Pricing() {
                                     {/* CTA Button */}
                                     <Link href={href} className="block mt-auto">
                                         <Button
-                                            className={`w-full h-12 text-base rounded-xl transition-all ${isPopular
-                                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-purple-500/50'
+                                            className={`w-full h-12 text-base font-medium rounded-xl transition-all ${isPopular
+                                                ? 'bg-brand-gold text-brand-dark hover:bg-yellow-400 hover:scale-[1.02] shadow-lg'
                                                 : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                                                 }`}
                                         >
@@ -170,7 +168,6 @@ export function Pricing() {
                     })}
                 </div>
 
-                {/* Bottom Note */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
@@ -179,7 +176,7 @@ export function Pricing() {
                     className="text-center mt-12"
                 >
                     <p className="text-zinc-400 text-sm">
-                        Tous les plans incluent la conformité Factur-X 2026 • Sans engagement • Résiliation en 1 clic
+                        Tous les plans incluent la conformité Factur-X 2026 • Sans engagement
                     </p>
                 </motion.div>
             </div>

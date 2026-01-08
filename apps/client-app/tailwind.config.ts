@@ -19,11 +19,18 @@ const config = {
         extend: {
             fontFamily: {
                 sans: ["var(--font-inter)", ...fontFamily.sans],
+                heading: ["var(--font-outfit)", ...fontFamily.sans],
             },
             animation: {
                 'pulse-slow': 'pulse 10s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             colors: {
+                brand: {
+                    dark: "#0F172A",
+                    gold: "#D4AF37",
+                    blue: "#6366F1",
+                    cyan: "#06B6D4",
+                },
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
