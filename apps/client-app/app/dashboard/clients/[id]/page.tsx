@@ -45,7 +45,16 @@ export default function EditClientPage() {
         try {
             const data = await clientService.getOne(id)
             setFormData({
-                ...data,
+                name: data.name || "",
+                email: data.email || "",
+                isBusiness: data.isBusiness ?? true,
+                siren: data.siren || "",
+                siret: (data as any).siret || "",
+                vatNumber: data.vatNumber || "",
+                legalForm: (data as any).legalForm || "",
+                nafCode: (data as any).nafCode || "",
+                vatSystem: (data as any).vatSystem || "",
+                phone: data.phone || "",
                 address: typeof data.address === 'string'
                     ? { street: data.address, city: '', zip: '', country: 'France' }
                     : {
@@ -78,9 +87,9 @@ export default function EditClientPage() {
                     ...prev,
                     name: data.name || prev.name,
                     siren: data.siren || prev.siren,
-                    siret: data.siret || prev.siret,
-                    legalForm: data.legalForm || prev.legalForm,
-                    nafCode: data.nafCode || prev.nafCode,
+                    siret: (data as any).siret || prev.siret,
+                    legalForm: (data as any).legalForm || prev.legalForm,
+                    nafCode: (data as any).nafCode || prev.nafCode,
                     vatNumber: data.vatNumber || prev.vatNumber,
                     address: {
                         street: (data as any).street || prev.address.street,
