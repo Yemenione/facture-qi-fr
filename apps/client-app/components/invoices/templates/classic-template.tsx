@@ -105,7 +105,7 @@ export const ClassicTemplate: React.FC<InvoiceTemplateProps> = ({
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                    {invoice.items.map((item, index) => (
+                    {invoice.items.map((item: any, index: number) => (
                         <tr key={index}>
                             <td className="py-4 text-gray-800">{item.description}</td>
                             <td className="py-4 text-right text-gray-600">{item.quantity}</td>
