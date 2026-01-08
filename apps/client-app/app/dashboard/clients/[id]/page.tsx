@@ -46,7 +46,14 @@ export default function EditClientPage() {
             const data = await clientService.getOne(id)
             setFormData({
                 ...data,
-                address: typeof data.address === 'string' ? { street: data.address, city: '', zip: '', country: 'France' } : (data.address || { street: '', city: '', zip: '', country: 'France' })
+                address: typeof data.address === 'string'
+                    ? { street: data.address, city: '', zip: '', country: 'France' }
+                    : {
+                        street: (data.address as any)?.street || '',
+                        city: (data.address as any)?.city || '',
+                        zip: (data.address as any)?.zip || '',
+                        country: (data.address as any)?.country || 'France'
+                    }
             })
         } catch (error) {
             console.error(error)
