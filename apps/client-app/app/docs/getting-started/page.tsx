@@ -36,7 +36,7 @@ export default function GettingStartedPage() {
                                     ))}
                                 </ul>
                                 <div className="p-4 bg-black/30 rounded-lg border border-white/5 text-sm text-zinc-400">
-                                    💡 <strong>Astuce :</strong> Vous pouvez modifier ces informations à tout moment dans l'onglet <em>Paramètres > Mon Entreprise</em>.
+                                    💡 <strong>Astuce :</strong> Vous pouvez modifier ces informations à tout moment dans l'onglet <em>Paramètres &gt; Mon Entreprise</em>.
                                 </div>
                             </div>
                         </div>
