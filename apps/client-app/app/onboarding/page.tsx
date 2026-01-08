@@ -64,7 +64,7 @@ export default function OnboardingPage() {
         try {
             const data = await companyService.searchSiret(company.siret)
             if (data) {
-                setCompany(prev => ({
+                setCompany((prev: any) => ({
                     ...prev,
                     name: data.name || prev.name,
                     rcs: data.rcs || prev.rcs,
