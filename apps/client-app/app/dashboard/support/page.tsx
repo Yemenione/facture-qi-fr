@@ -146,13 +146,13 @@ export default function SupportPage() {
                                 <AccordionItem value="item-2" className="px-4">
                                     <AccordionTrigger>Comment exporter le fichier FEC ?</AccordionTrigger>
                                     <AccordionContent className="text-slate-600">
-                                        Allez dans "Comptabilité" > "Exports" et cliquez sur "Générer FEC".
+                                        Allez dans "Comptabilité" &gt; "Exports" et cliquez sur "Générer FEC".
                                     </AccordionContent>
                                 </AccordionItem>
                                 <AccordionItem value="item-3" className="px-4">
                                     <AccordionTrigger>Puis-je changer mon modèle par défaut ?</AccordionTrigger>
                                     <AccordionContent className="text-slate-600">
-                                        Oui, dans "Paramètres" > "Modèles de facture", créez ou sélectionnez un modèle et cochez "Définir par défaut".
+                                        Oui, dans "Paramètres" &gt; "Modèles de facture", créez ou sélectionnez un modèle et cochez "Définir par défaut".
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>
