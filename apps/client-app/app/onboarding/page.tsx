@@ -36,7 +36,7 @@ export default function OnboardingPage() {
             try {
                 const data = await companyService.get()
                 // If company is already full, redirect to dashboard
-                if (data.siret && data.address?.street && data.iban) {
+                if (data.siret && data.address?.street && (data as any).iban) {
                     router.push("/dashboard")
                     return
                 }
