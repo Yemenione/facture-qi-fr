@@ -9,7 +9,7 @@ export default function EditTemplatePage() {
     const params = useParams()
     const id = params.id as string
     const router = useRouter()
-    const [template, setTemplate] = useState(null)
+    const [template, setTemplate] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
