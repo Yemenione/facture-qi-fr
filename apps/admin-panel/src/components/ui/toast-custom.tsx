@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { cn } from "../../lib/utils"
 
 export type ToastType = "success" | "error" | "warning" | "info"

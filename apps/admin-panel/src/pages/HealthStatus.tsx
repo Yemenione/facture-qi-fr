@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
-import { adminService } from '../services/admin.service';
-import { Activity, Server, Database, Cloud, Clock, CheckCircle, AlertTriangle, XCircle, ShieldCheck } from 'lucide-react';
-import { useToast } from '../components/providers/toast-provider';
+import { useState } from 'react';
+import { Activity, Server, Clock, CheckCircle, AlertTriangle, XCircle, ShieldCheck } from 'lucide-react';
 
 // Mock data types
 interface SystemComponent {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../services/admin.service';
 import { useToast } from '../components/providers/toast-provider';
-import { MessageSquare, User, Clock, CheckCircle, Send, AlertCircle } from 'lucide-react';
+import { MessageSquare, User, Send } from 'lucide-react';
 
 export default function SupportTickets() {
     const [tickets, setTickets] = useState<any[]>([]);

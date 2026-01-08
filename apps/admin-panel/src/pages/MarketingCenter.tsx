@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../services/admin.service';
-import { Megaphone, Send, Mail, Users, RefreshCw } from 'lucide-react';
+import { Megaphone, Send, Users, RefreshCw } from 'lucide-react';
 import { useToast } from '../components/providers/toast-provider';
-import { motion } from 'framer-motion';
 
 export default function MarketingCenter() {
     const [campaigns, setCampaigns] = useState<any[]>([]);

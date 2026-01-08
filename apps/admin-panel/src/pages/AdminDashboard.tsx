@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../services/admin.service';
-import { Building2, Users, TrendingUp, Activity, AlertCircle, Euro } from 'lucide-react';
+import { Building2, Users, TrendingUp, Activity, Euro } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { motion } from 'framer-motion';
 

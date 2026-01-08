@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../services/admin.service';
-import { ScrollText, User, Shield, Activity } from 'lucide-react';
+import { ScrollText, Shield } from 'lucide-react';
 import { useToast } from '../components/providers/toast-provider';
 
 export default function ActivityLog() {
