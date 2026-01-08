@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Activity, Server, Clock, CheckCircle, AlertTriangle, XCircle, ShieldCheck } from 'lucide-react';
 
 // Mock data types
