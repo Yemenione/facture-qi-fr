@@ -41,7 +41,7 @@ export default function OnboardingPage() {
                     return
                 }
 
-                setCompany(prev => ({
+                setCompany((prev: any) => ({
                     ...prev,
                     ...data,
                     address: typeof data.address === 'string' ? { street: data.address } : (data.address || prev.address)
