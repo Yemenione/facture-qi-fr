@@ -14,7 +14,7 @@ import { Progress } from "@/components/ui/progress"
 
 export default function OnboardingPage() {
     const router = useRouter()
-    const { toast } = useToast()
+    const toast = useToast()
     const [step, setStep] = useState(1)
     const [loading, setLoading] = useState(false)
     const [initializing, setInitializing] = useState(true)
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
                         return (
                             <div key={s.id} className="flex flex-col items-center relative z-10">
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${active ? "bg-indigo-600 text-white shadow-lg scale-110" :
-                                        done ? "bg-emerald-500 text-white" : "bg-white text-slate-400 border border-slate-200"
+                                    done ? "bg-emerald-500 text-white" : "bg-white text-slate-400 border border-slate-200"
                                     }`}>
                                     {done ? <CheckCircle2 className="w-6 h-6" /> : <s.icon className="w-5 h-5" />}
                                 </div>
