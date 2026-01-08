@@ -165,9 +165,9 @@ export function InvoiceForm({ initialData, invoiceId }: InvoiceFormProps) {
             const payload = {
                 ...data,
                 items: sanitizedItems,
-                issueDate: data.issueDate,
-                dueDate: data.dueDate,
-                validityDate: data.validityDate
+                issueDate: data.issueDate instanceof Date ? data.issueDate.toISOString() : data.issueDate,
+                dueDate: data.dueDate instanceof Date ? data.dueDate.toISOString() : data.dueDate,
+                validityDate: data.validityDate instanceof Date ? data.validityDate.toISOString() : data.validityDate
             }
 
             if (invoiceId) {

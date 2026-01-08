@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Building2, CreditCard, Palette, CheckCircle2, Search, ArrowRight, Loader2, UploadCloud } from "lucide-react"
-import companyService from "@/services/company.service"
+import companyService, { Company } from "@/services/company.service"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,7 +20,7 @@ export default function OnboardingPage() {
     const [initializing, setInitializing] = useState(true)
 
     // Form States
-    const [company, setCompany] = useState<any>({
+    const [company, setCompany] = useState<Partial<Company>>({
         name: "",
         siret: "",
         vatNumber: "",

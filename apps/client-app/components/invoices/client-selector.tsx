@@ -61,6 +61,7 @@ export function ClientSelector({ value, onChange }: ClientSelectorProps) {
             }
 
             // 2. Create Client Automatically
+            const companyData = companyInfo as any; // searchSiret returns extra fields not in Company type
             const newClientData = {
                 name: companyInfo.name || "Client Inconnu",
                 email: "", // Not provided by public registry
@@ -68,12 +69,12 @@ export function ClientSelector({ value, onChange }: ClientSelectorProps) {
                 siret: companyInfo.siret,
                 vatNumber: companyInfo.vatNumber,
                 address: {
-                    street: companyInfo.street || "",
-                    zip: companyInfo.zipCode || "",
-                    city: companyInfo.city || "",
+                    street: companyData.street || "",
+                    zip: companyData.zipCode || "",
+                    city: companyData.city || "",
                     country: "France"
                 },
-                isProfessional: true
+                isBusiness: true
             }
 
             const newClient = await clientService.create(newClientData)

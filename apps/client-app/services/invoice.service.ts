@@ -13,8 +13,13 @@ export interface CreateInvoiceDto {
     clientId: string;
     items: InvoiceItemDto[];
     type?: 'INVOICE' | 'QUOTE' | 'CREDIT_NOTE';
-    validityDate?: Date;
-    dueDate?: string;
+    validityDate?: Date | string;
+    issueDate?: Date | string;
+    dueDate?: Date | string;
+    paymentTerms?: string;
+    discount?: number;
+    discountType?: 'PERCENTAGE' | 'FIXED';
+    notes?: string;
 }
 
 const invoiceService = {

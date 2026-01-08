@@ -13,6 +13,19 @@ export interface Company {
     phone?: string;
     address?: any;
     logoUrl?: string;
+    capital?: string;
+    rcs?: string;
+    iban?: string;
+    bic?: string;
+    legalMentions?: string;
+    penalties?: string;
+    legalForm?: string;
+    nafCode?: string;
+    activityLabel?: string;
+    managerName?: string;
+    rcsNumber?: string;
+    creationDate?: string;
+    category?: string;
 }
 
 const getAuthHeader = () => {

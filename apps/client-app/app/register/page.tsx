@@ -38,7 +38,7 @@ export default function RegisterPage() {
         setLoading(true);
         try {
             const data = await authService.register(formData);
-            login(data.user);
+            login(data.user, data.access_token);
             router.push('/dashboard');
         } catch (err: any) {
             console.error(err);

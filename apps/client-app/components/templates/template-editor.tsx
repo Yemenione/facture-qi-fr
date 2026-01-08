@@ -260,7 +260,7 @@ export default function TemplateEditor({ initialData, isEditing = false }: Templ
                                     <Label>Police</Label>
                                     <Select
                                         value={formValues.fontFamily}
-                                        onValueChange={(val) => setValue("fontFamily", val)}
+                                        onValueChange={(val: string) => setValue("fontFamily", val)}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Choisir une police" />
@@ -285,7 +285,7 @@ export default function TemplateEditor({ initialData, isEditing = false }: Templ
                                     <Label>Style d'en-tête</Label>
                                     <Select
                                         value={formValues.headerStyle}
-                                        onValueChange={(val) => setValue("headerStyle", val)}
+                                        onValueChange={(val: string) => setValue("headerStyle", val)}
                                     >
                                         <SelectTrigger>
                                             <SelectValue />
@@ -309,7 +309,7 @@ export default function TemplateEditor({ initialData, isEditing = false }: Templ
                                     <Label>Position</Label>
                                     <Select
                                         value={formValues.logoPosition}
-                                        onValueChange={(val) => setValue("logoPosition", val)}
+                                        onValueChange={(val: string) => setValue("logoPosition", val)}
                                     >
                                         <SelectTrigger>
                                             <SelectValue />
