@@ -48,10 +48,10 @@ export default function NewClientPage() {
                     ...prev,
                     name: data.name || prev.name,
                     siren: data.siren || prev.siren, // Update SIREN if normalized
-                    siret: data.siret || prev.siret,
-                    legalForm: data.legalForm || prev.legalForm, // e.g. "Entrepreneur individuel"
-                    nafCode: data.nafCode || prev.nafCode,       // e.g. "6201Z"
-                    vatNumber: data.vatNumber || prev.vatNumber, // Auto-calculated Intra-EU VAT
+                    siret: (data as any).siret || prev.siret,
+                    legalForm: (data as any).legalForm || prev.legalForm, // e.g. "Entrepreneur individuel"
+                    nafCode: (data as any).nafCode || prev.nafCode,       // e.g. "6201Z"
+                    vatNumber: (data as any).vatNumber || prev.vatNumber, // Auto-calculated Intra-EU VAT
                     address: {
                         street: (data as any).street || prev.address.street,
                         city: (data as any).city || prev.address.city,
